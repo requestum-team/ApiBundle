@@ -1,0 +1,43 @@
+services:
+    core.action.abstract:
+        abstract: true
+        calls:
+            - ["setContainer", ["@service_container"]]
+
+    core.resourse.metadata_factory:
+        class: Requestum\ApiBundle\Rest\ResourceMetadataFactory
+        arguments: ["@annotations.reader"]
+
+    core.resourse.attribute_extraction_strategy:
+        class: Requestum\ApiBundle\Serializer\Normalizer\AttributeExtractionStrategy
+        arguments: ["@core.resourse.metadata_factory"]
+
+    core.json_decode_listener:
+        class: Requestum\ApiBundle\EventListener\JsonDecoderListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }
+
+    filter.filter_expander:
+        class: Requestum\ApiBundle\Filter\FilterExpander
+
+    core.listener.exception:
+        class: Requestum\ApiBundle\EventListener\Exception\ExceptionListener
+        parent: twig.exception_listener
+        calls:
+            - [setEnvironment, ["%kernel.environment%"]]
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: -10 }
+
+    core.normalizer.pagerfanta:
+        class: Requestum\ApiBundle\Serializer\Normalizer\PagerfantaNormalizer
+        tags:
+            - { name: serializer.normalizer }
+
+    core.util.error_factory:
+        class: Requestum\ApiBundle\Util\ErrorFactory
+
+    core.normalizer.form_error:
+        class: Requestum\ApiBundle\Serializer\Normalizer\SymfonyFormErrorNormalizer
+        arguments: ["@core.util.error_factory"]
+        tags:
+            - { name: serializer.normalizer }
