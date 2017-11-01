@@ -1,0 +1,52 @@
+{
+  "name": "requestum/api-bundle",
+  "type" : "symfony-bundle",
+  "description": "Symfony ApiBundle",
+  "keywords": ["symfony", "api", "bundle"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sergey Stavichenko",
+      "email": "sergey.stavichenko@gmail.com"
+    },
+    {
+      "name": "Maxim Logvinenko",
+      "email": "maxik.sp@gmail.com"
+    },
+    {
+      "name": "Dmytro Somik",
+      "email": "dsemik@gmail.com"
+    },
+    {
+      "name": "Dmitry Volkov",
+      "email": "d.volkov999@gmail.com"
+    },
+    {
+      "name": "Turchak Alex",
+      "email": "turchakalexx@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4",
+    "swiftmailer/swiftmailer": "^4.2 || ^5.0",
+    "symfony/dependency-injection": "^3.1",
+    "symfony/serializer": "^3.1",
+    "symfony/form": "^3.1",
+    "white-october/pagerfanta-bundle": "^1.0",
+    "doctrine/doctrine-bundle": "^1.6",
+    "doctrine/orm": "^2.5",
+    "symfony/yaml": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Requestum\\ApiBundle\\": ""
+    }
+  },
+  "minimum-stability": "stable",
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/requestum-team/ApiBundle.git"
+    }
+  ]
+}
