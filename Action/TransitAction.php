@@ -4,12 +4,13 @@ namespace Requestum\ApiBundle\Action;
 
 use Requestum\ApiBundle\Exception\Controller\FormValidationException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Workflow\Transition;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class TransitAction
@@ -62,13 +63,24 @@ class TransitAction extends UpdateAction
     {
         $form = parent::buildForm($entity, $options);
 
-        $form->add('transition', TextType::class, [
-            'required' => true,
+        $form->add('transition', ChoiceType::class, [
+            'choices' => $this->options['transitions'],
             'mapped' => false,
         ]);
 
         return $form;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setDefaults([
+            'transitions' => [],
+        ]);
+    }
 
 }
