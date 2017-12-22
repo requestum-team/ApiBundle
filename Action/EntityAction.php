@@ -8,6 +8,7 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Requestum\ApiBundle\Action\Extension\FiltersExtensionInterface;
 use Requestum\ApiBundle\Repository\FilterableRepositoryInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -106,6 +107,10 @@ abstract class EntityAction extends BaseAction
     protected function createQueryBuilder(array $filters = [])
     {
         $repository = $this->getDoctrine()->getRepository($this->entityClass);
+
+        if  ($repository instanceof ContainerAwareInterface) {
+            $repository->setContainer($this->container);
+        }
 
         if (!$repository instanceof FilterableRepositoryInterface) {
             throw new \InvalidArgumentException(sprintf('Repository should implement %s', FilterableRepositoryInterface::class));
