@@ -2,6 +2,7 @@
 
 namespace Requestum\ApiBundle\Action;
 
+use Requestum\ApiBundle\Event\DefaultActionEvent;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,7 @@ class DeleteAction extends EntityAction
         $this->checkAccess($entity);
 
         try {
+            $this->beforeDelete($request, $entity);
             $this->processDeletion($entity);
         } catch (ForeignKeyConstraintViolationException $e) {
             throw new BadRequestHttpException('Cannot delete entity due to constraint reference');
@@ -44,6 +46,17 @@ class DeleteAction extends EntityAction
     }
 
     /**
+     * @param Request $request
+     * @param $entity
+     */
+    protected function beforeDelete(Request $request, $entity)
+    {
+        foreach ($this->options['before_delete_events'] + ['action.before_delete'] as $event) {
+            $this->get('event_dispatcher')->dispatch($event, new DefaultActionEvent($request, $entity, $this->getDoctrine()));
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -53,6 +66,7 @@ class DeleteAction extends EntityAction
         $resolver
             ->setDefaults([
                 'access_attribute' => 'delete',
+                'before_delete_events' => [],
             ])
         ;
     }
