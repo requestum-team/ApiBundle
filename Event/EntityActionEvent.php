@@ -6,7 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 
-class DefaultActionEvent extends Event
+class EntityActionEvent extends Event
 {
     /**
      * @var Request
@@ -24,7 +24,7 @@ class DefaultActionEvent extends Event
     protected $doctrineRegistry;
 
     /**
-     * DefaultActionEvent constructor.
+     * EntityActionEvent constructor.
      * @param Request $request
      * @param $subject
      * @param Registry $doctrineRegistry
