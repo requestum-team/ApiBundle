@@ -50,6 +50,19 @@ class ErrorFactoryTest extends \PHPUnit_Framework_TestCase
         static::assertEquals($expected, $this->errorFactory->formatError($error));
     }
 
+    public function testFormatFormConstraintViolation()
+    {
+        $constraint = new NotBlank();
+        $error = new ConstraintViolation('message', '', [], null, '', null, null, NotBlank::IS_BLANK_ERROR, $constraint);
+
+        $expected = [
+            'error' => 'error.constraint.is_blank_error',
+            'description' => 'message',
+        ];
+
+        static::assertEquals($expected, $this->errorFactory->formatError($error));
+    }
+
     public function testFormatFormErrorStringParameters()
     {
         $expected = [
