@@ -9,9 +9,6 @@ use Requestum\ApiBundle\Rest\ResourceMetadataFactory;
 use Requestum\ApiBundle\Rest\Metadata\Reference;
 use Requestum\ApiBundle\Rest\Metadata\UserScoped;
 
-/**
- * @UserScoped(path="path.to.user")
- */
 class TestObject
 {
 
@@ -43,10 +40,6 @@ class ResourceMetadataFactoryTest extends TestCase
         $testObject = new TestObject();
 
         $classMetadata = $this->resourceMetadataFactory->getClassMetada($testObject);
-
-        static::assertArrayHasKey(UserScoped::class, $classMetadata);
-        static::assertInstanceOf(UserScoped::class, $classMetadata[UserScoped::class]);
-        static::assertEquals('path.to.user', $classMetadata[UserScoped::class]->path);
 
         static::assertArrayHasKey('properties', $classMetadata);
         static::assertArrayHasKey('id', $classMetadata['properties']);
