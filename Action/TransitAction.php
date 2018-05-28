@@ -9,6 +9,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -41,13 +42,19 @@ class TransitAction extends UpdateAction
                 return $value->getName();
             }, $workflow->getEnabledTransitions($entity));
 
+
+            $messageTemplate = 'Wrong transition "{{transition}}". Possible transitions: ["{{possible_transitions}}"]';
+            $messageParams = [
+                '{{transition}}' => $transitionName,
+                '{{possible_transitions}}' => implode('" ,"', $possibleTransitionNames),
+            ];
+
             throw new FormValidationException(new FormError(
+                $this->get('translator')->trans($messageTemplate, $messageParams),
+                $messageTemplate,
+                $messageParams,
                 null,
-                'error.workflow.wrong_transition',
-                [
-                    '%impossible_transition%' => $transitionName,
-                    '%possible_transitions%' => implode(' ,', $possibleTransitionNames),
-                ]
+                'error.workflow.wrong_transition'
             ), '[transition]');
         }
 

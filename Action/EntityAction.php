@@ -80,11 +80,17 @@ abstract class EntityAction extends BaseAction
     {
         $param = $param ?: $this->options['fetch_field'];
 
-        if (!($value = $request->get($param))) {
-            throw $this->createNotFoundException();
+        $filters = [];
+
+        foreach ((array) $param as $singleParam) {
+            if (!($value = $request->get($singleParam))) {
+                throw $this->createNotFoundException();
+            }
+
+            $filters[$singleParam] = $value;
         }
 
-        $query = $this->createQueryBuilder([$param => $value])->getQuery();
+        $query = $this->createQueryBuilder($filters)->getQuery();
 
         if ($useLock) {
             $query->setLockMode(LockMode::PESSIMISTIC_WRITE);
