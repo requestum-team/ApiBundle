@@ -8,8 +8,10 @@ namespace Requestum\ApiBundle\Action\Extension;
 interface FiltersExtensionInterface
 {
     /**
-     * @param $filters
+     * @param array  $filters
+     * @param string $entityClass
+     * @param array  $options
      * @return mixed
      */
-    public function extend(&$filters);
+    public function extend(&$filters, $entityClass, $options = []);
 }
