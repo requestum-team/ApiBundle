@@ -2,6 +2,7 @@
 
 namespace Requestum\ApiBundle\Action;
 
+use Requestum\ApiBundle\Action\Extension\OptionExtensionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,12 +14,17 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * BaseController Class.
  */
-abstract class BaseAction extends Controller implements ActionInterface
+abstract class BaseAction extends Controller implements ActionInterface, OptionExtensionInterface
 {
     /**
      * @var array
      */
     protected $options;
+
+    /**
+     * @var array
+     */
+    private $givenOptions = [];
 
     /**
      * @var OptionsResolver
@@ -31,16 +37,26 @@ abstract class BaseAction extends Controller implements ActionInterface
     public function __construct()
     {
         $this->optionResolver = new OptionsResolver();
-        $this->configureOptions($this->optionResolver);
-        $this->options = $this->optionResolver->resolve();
+        $this->resolveOptions($this);
     }
 
+    /**
+     * @param OptionExtensionInterface $extension
+     */
+    protected function resolveOptions(OptionExtensionInterface $extension = null)
+    {
+        if (null !== $extension){
+            $extension->setOptionDefaults($this->optionResolver);
+        }
+        $this->options = $this->optionResolver->resolve($this->givenOptions);
+    }
     /**
      * @param $options
      */
     public function setOptions($options)
     {
-        $this->options = $this->optionResolver->resolve($options);
+        $this->givenOptions = $options;
+        $this->resolveOptions();
     }
 
     /**
@@ -67,6 +83,11 @@ abstract class BaseAction extends Controller implements ActionInterface
 
             throw new BadRequestHttpException();
         }
+    }
+
+    public function setOptionDefaults(OptionsResolver $resolver)
+    {
+        $this->configureOptions($resolver);
     }
 
     /**
