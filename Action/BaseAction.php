@@ -2,7 +2,7 @@
 
 namespace Requestum\ApiBundle\Action;
 
-use Requestum\ApiBundle\Action\Extension\OptionExtensionInterface;
+use Requestum\ApiBundle\Action\Extension\OptionsExtensionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * BaseController Class.
  */
-abstract class BaseAction extends Controller implements ActionInterface, OptionExtensionInterface
+abstract class BaseAction extends Controller implements ActionInterface, OptionsExtensionInterface
 {
     /**
      * @var array
@@ -41,9 +41,9 @@ abstract class BaseAction extends Controller implements ActionInterface, OptionE
     }
 
     /**
-     * @param OptionExtensionInterface $extension
+     * @param OptionsExtensionInterface $extension
      */
-    protected function resolveOptions(OptionExtensionInterface $extension = null)
+    protected function resolveOptions(OptionsExtensionInterface $extension = null)
     {
         if (null !== $extension){
             $extension->setOptionDefaults($this->optionResolver);

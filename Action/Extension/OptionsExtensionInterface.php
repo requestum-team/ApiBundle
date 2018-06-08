@@ -5,9 +5,9 @@ namespace Requestum\ApiBundle\Action\Extension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class OptionExtensionInterface
+ * Class OptionsExtensionInterface
  */
-interface OptionExtensionInterface
+interface OptionsExtensionInterface
 {
     /**
      * @param OptionsResolver $resolver

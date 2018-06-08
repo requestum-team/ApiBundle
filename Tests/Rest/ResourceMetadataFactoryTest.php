@@ -39,7 +39,7 @@ class ResourceMetadataFactoryTest extends TestCase
     {
         $testObject = new TestObject();
 
-        $classMetadata = $this->resourceMetadataFactory->getClassMetada($testObject);
+        $classMetadata = $this->resourceMetadataFactory->getClassMetadata($testObject);
 
         static::assertArrayHasKey('properties', $classMetadata);
         static::assertArrayHasKey('id', $classMetadata['properties']);
