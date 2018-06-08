@@ -3,9 +3,7 @@
 namespace Requestum\ApiBundle\Rest;
 
 use Doctrine\Common\Util\ClassUtils;
-use Symfony\Component\Serializer\Mapping\Factory\ClassResolverTrait;
 use Doctrine\Common\Annotations\Reader;
-
 use Requestum\ApiBundle\Rest\Metadata\Reference;
 
 /**
@@ -17,8 +15,6 @@ use Requestum\ApiBundle\Rest\Metadata\Reference;
  */
 class ResourceMetadataFactory
 {
-    use ClassResolverTrait;
-
     /**
      * @var Reader
      */
@@ -38,9 +34,22 @@ class ResourceMetadataFactory
     }
 
     /**
-     * {@inheritdoc}
+     * @deprecated use ResourceMetadataFactory::getClassMetadata() instead
+     * @param mixed $value
+     *
+     * @return array
      */
     public function getClassMetada($value)
+    {
+        return $this->getClassMetadata($value);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return array
+     */
+    public function getClassMetadata($value)
     {
         $class = ClassUtils::getRealClass($this->getClass($value));
 
@@ -74,7 +83,7 @@ class ResourceMetadataFactory
      */
     public function getPropertyMetadata($object, $property)
     {
-        $loadedClasses = $this->getClassMetada($object);
+        $loadedClasses = $this->getClassMetadata($object);
 
         return isset($loadedClasses['properties'][$property]) ? $loadedClasses['properties'][$property]:[];
     }
@@ -86,16 +95,37 @@ class ResourceMetadataFactory
      */
     private function arrayLevelShift($annotations)
     {
-        $result = [];
+        return array_reduce($annotations, function ($carry, $annotation) {
+            return $carry[get_class($annotation)] = $annotation;
+        }, []);
+    }
 
-        foreach ($annotations as $annotation) {
-            switch (get_class($annotation)) {
-                case Reference::class:
-                    $result[get_class($annotation)] = $annotation;
-                    break;
+    /**
+     * Have to copy this method from Symfony\Component\Serializer\Mapping\Factory\ClassResolverTrait
+     * as far as this trait is internal :(
+     *
+     * Gets a class name for a given class or instance.
+     *
+     * @param mixed $value
+     *
+     * @return string
+     *
+     * @throws InvalidArgumentException If the class does not exists
+     */
+    private function getClass($value)
+    {
+        if (is_string($value)) {
+            if (!class_exists($value) && !interface_exists($value)) {
+                throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $value));
             }
+
+            return ltrim($value, '\\');
         }
 
-        return !empty($result) ? $result:null;
+        if (!is_object($value)) {
+            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: "%s"', gettype($value)));
+        }
+
+        return get_class($value);
     }
 }

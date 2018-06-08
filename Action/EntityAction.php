@@ -7,7 +7,7 @@ use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Requestum\ApiBundle\Action\Extension\FiltersExtensionInterface;
-use Requestum\ApiBundle\Action\Extension\OptionExtensionInterface;
+use Requestum\ApiBundle\Action\Extension\OptionsExtensionInterface;
 use Requestum\ApiBundle\Repository\FilterableRepositoryInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,7 +50,7 @@ abstract class EntityAction extends BaseAction
     public function addFiltersExtension(FiltersExtensionInterface $extension)
     {
         $this->filtersExtensions[] = $extension;
-        if ($extension instanceof OptionExtensionInterface) {
+        if ($extension instanceof OptionsExtensionInterface) {
             $this->resolveOptions($extension);
         }
     }
