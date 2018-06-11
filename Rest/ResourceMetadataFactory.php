@@ -95,9 +95,11 @@ class ResourceMetadataFactory
      */
     private function arrayLevelShift($annotations)
     {
-        return array_reduce($annotations, function ($carry, $annotation) {
-            return $carry[get_class($annotation)] = $annotation;
-        }, []);
+        $result = [];
+        foreach ($annotations as $annotation) {
+            $result[get_class($annotation)] = $annotation;
+        }
+        return !empty($result) ? $result:null;
     }
 
     /**
