@@ -55,7 +55,7 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
      */
     public function setOptions($options)
     {
-        $this->givenOptions = $options;
+        $this->givenOptions = array_replace_recursive($this->givenOptions, $options);
         $this->resolveOptions();
     }
 
