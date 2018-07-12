@@ -17,10 +17,6 @@ abstract class RestCrudTestCase extends WebTestCase
         'HTTP_Authorization' => 'Bearer AccessToken_For_Admin',
     ];
 
-    protected $options = [
-        'entity_manager' => 'doctrine'
-    ];
-
     /**
      * @var Client
      */
@@ -129,7 +125,7 @@ abstract class RestCrudTestCase extends WebTestCase
             ->request(Request::METHOD_DELETE, $this->getResourceUrl($url).'/'.$id, [], [], $this->headers);
         $this->assertEquals($statusCode, $this->getClient()->getResponse()->getStatusCode());
 
-        $result = $this->getDoctrineManager()->getRepository($this->getEntityName())->find($id);
+        $result = $this->getClient()->getContainer()->get('doctrine.orm.default_entity_manager')->getRepository($this->getEntityName())->find($id);
         
         if ($softDelete) {
             $this->assertNotEquals(null, $result);
@@ -184,7 +180,7 @@ abstract class RestCrudTestCase extends WebTestCase
     {
         $criteria = $criteria ?: $this->findOneBy;
 
-        $object = $this->getDoctrineManager()
+        $object = $this->getClient()->getContainer()->get('doctrine.orm.default_entity_manager')
             ->getRepository($class)
             ->findOneBy($criteria)
         ;
@@ -213,28 +209,5 @@ abstract class RestCrudTestCase extends WebTestCase
     protected function getClient()
     {
         return $this->client;
-    }
-
-    /**
-     * @return mixed
-     * @throws \Exception
-     */
-    protected function getDoctrineManager()
-    {
-        switch ($this->options['entity_manager']) {
-            case 'doctrine_mongodb':
-                $manager = $this->getClient()->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-                break;
-
-            case 'doctrine':
-                $manager = $this->getClient()->getContainer()->get('doctrine.orm.default_entity_manager');
-                break;
-
-            default:
-                throw new \Exception('Entity manager not declared');
-                break;
-        }
-
-        return $manager;
     }
 }

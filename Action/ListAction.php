@@ -3,11 +3,9 @@
 namespace Requestum\ApiBundle\Action;
 
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\MongoDB\Query\Builder;
 use Requestum\ApiBundle\Filter\Exception\BadFilterException;
 use Requestum\ApiBundle\Filter\Processor\FilterProcessorInterface;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use Pagerfanta\Exception\InvalidArgumentException;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -157,27 +155,15 @@ class ListAction extends EntityAction
     }
 
     /**
-     * @param QueryBuilder|Builder $entitiesQueryBuilder
-     * @param integer              $perPage
-     * @param integer              $page
+     * @param QueryBuilder $entitiesQueryBuilder
+     * @param integer      $perPage
+     * @param integer      $page
      *
      * @return Pagerfanta
      */
     protected function getPager($entitiesQueryBuilder, $perPage, $page)
     {
-        switch ($this->options['entity_manager']) {
-            case 'doctrine_mongodb':
-                $adapter = new DoctrineODMMongoDBAdapter($entitiesQueryBuilder);
-                break;
-
-            case 'doctrine':
-                $adapter = new DoctrineORMAdapter($entitiesQueryBuilder, $this->options['pagerfanta_fetch_join_collection'], $this->options['pagerfanta_use_output_walkers']);
-                break;
-
-            default:
-                throw new \Exception('Entity manager not declared');
-                break;
-        }
+        $adapter = new DoctrineORMAdapter($entitiesQueryBuilder, $this->options['pagerfanta_fetch_join_collection'], $this->options['pagerfanta_use_output_walkers']);
 
         $pager = new Pagerfanta($adapter);
 
