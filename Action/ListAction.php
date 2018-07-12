@@ -2,6 +2,7 @@
 
 namespace Requestum\ApiBundle\Action;
 
+use Doctrine\ORM\QueryBuilder;
 use Requestum\ApiBundle\Filter\Exception\BadFilterException;
 use Requestum\ApiBundle\Filter\Processor\FilterProcessorInterface;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
@@ -54,11 +55,7 @@ class ListAction extends EntityAction
 
 
         try {
-            $result = new Pagerfanta(new DoctrineORMAdapter($entitiesQueryBuilder, false));
-            $result
-                ->setMaxPerPage($perPage)
-                ->setCurrentPage($page)
-            ;
+            $result = $this->getPager($entitiesQueryBuilder, $perPage, $page);
         } catch (InvalidArgumentException $exception) {
             throw new BadRequestHttpException();
         }
@@ -126,6 +123,8 @@ class ListAction extends EntityAction
         $resolver->setDefaults([
             'default_per_page' => 20,
             'filters' => [],
+            'pagerfanta_fetch_join_collection' => false,
+            'pagerfanta_use_output_walkers' => null,
         ]);
 
         $resolver->setNormalizer('filters', function (Options $options, $value) {
@@ -153,5 +152,25 @@ class ListAction extends EntityAction
 
             return $result + $reservedFilters;
         });
+    }
+
+    /**
+     * @param QueryBuilder $entitiesQueryBuilder
+     * @param integer      $perPage
+     * @param integer      $page
+     *
+     * @return Pagerfanta
+     */
+    protected function getPager($entitiesQueryBuilder, $perPage, $page)
+    {
+        $adapter = new DoctrineORMAdapter($entitiesQueryBuilder, $this->options['pagerfanta_fetch_join_collection'], $this->options['pagerfanta_use_output_walkers']);
+
+        $pager = new Pagerfanta($adapter);
+
+        $pager
+            ->setMaxPerPage($perPage)
+            ->setCurrentPage($page);
+
+        return $pager;
     }
 }
