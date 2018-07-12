@@ -139,7 +139,8 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
     {
         $resolver->setDefaults([
             'serialization_groups' => ['default'],
-            'access_attribute' => null
+            'access_attribute' => null,
+            'entity_manager' => 'doctrine'
         ]);
     }
 }

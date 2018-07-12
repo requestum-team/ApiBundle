@@ -116,7 +116,7 @@ abstract class EntityAction extends BaseAction
      */
     protected function createQueryBuilder(array $filters = [])
     {
-        $repository = $this->getDoctrine()->getRepository($this->entityClass);
+        $repository = $this->getDoctrineManager()->getRepository($this->entityClass);
 
         if  ($repository instanceof ContainerAwareInterface) {
             $repository->setContainer($this->container);
@@ -181,5 +181,27 @@ abstract class EntityAction extends BaseAction
             'fetch_field' => 'id',
             'preset_filters' => [],
         ]);
+    }
+
+    /**
+     * @return \Doctrine\Bundle\DoctrineBundle\Registry|\Doctrine\Common\Persistence\ObjectManager|object
+     */
+    protected function getDoctrineManager()
+    {
+        switch ($this->options['entity_manager']) {
+            case 'doctrine_mongodb':
+                $manager = $this->get('doctrine_mongodb');
+                break;
+
+            case 'doctrine':
+                $manager = $this->getDoctrine();
+                break;
+
+            default:
+                throw new \Exception('Entity manager not declared');
+                break;
+        }
+
+        return $manager;
     }
 }

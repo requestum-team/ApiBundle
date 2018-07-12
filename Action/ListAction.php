@@ -2,9 +2,12 @@
 
 namespace Requestum\ApiBundle\Action;
 
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\MongoDB\Query\Builder;
 use Requestum\ApiBundle\Filter\Exception\BadFilterException;
 use Requestum\ApiBundle\Filter\Processor\FilterProcessorInterface;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use Pagerfanta\Exception\InvalidArgumentException;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -54,11 +57,7 @@ class ListAction extends EntityAction
 
 
         try {
-            $result = new Pagerfanta(new DoctrineORMAdapter($entitiesQueryBuilder, false));
-            $result
-                ->setMaxPerPage($perPage)
-                ->setCurrentPage($page)
-            ;
+            $result = $this->getPager($entitiesQueryBuilder, $perPage, $page);
         } catch (InvalidArgumentException $exception) {
             throw new BadRequestHttpException();
         }
@@ -126,6 +125,8 @@ class ListAction extends EntityAction
         $resolver->setDefaults([
             'default_per_page' => 20,
             'filters' => [],
+            'pagerfanta_fetch_join_collection' => false,
+            'pagerfanta_use_output_walkers' => null,
         ]);
 
         $resolver->setNormalizer('filters', function (Options $options, $value) {
@@ -153,5 +154,37 @@ class ListAction extends EntityAction
 
             return $result + $reservedFilters;
         });
+    }
+
+    /**
+     * @param QueryBuilder|Builder $entitiesQueryBuilder
+     * @param integer              $perPage
+     * @param integer              $page
+     *
+     * @return Pagerfanta
+     */
+    protected function getPager($entitiesQueryBuilder, $perPage, $page)
+    {
+        switch ($this->options['entity_manager']) {
+            case 'doctrine_mongodb':
+                $adapter = new DoctrineODMMongoDBAdapter($entitiesQueryBuilder);
+                break;
+
+            case 'doctrine':
+                $adapter = new DoctrineORMAdapter($entitiesQueryBuilder, $this->options['pagerfanta_fetch_join_collection'], $this->options['pagerfanta_use_output_walkers']);
+                break;
+
+            default:
+                throw new \Exception('Entity manager not declared');
+                break;
+        }
+
+        $pager = new Pagerfanta($adapter);
+
+        $pager
+            ->setMaxPerPage($perPage)
+            ->setCurrentPage($page);
+
+        return $pager;
     }
 }
