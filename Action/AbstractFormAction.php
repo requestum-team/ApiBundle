@@ -103,9 +103,11 @@ abstract class AbstractFormAction extends EntityAction
 
                 return $this->handleResponse($this->options['return_entity'] ? $entity : null, $this->options['success_status_code']);
             } catch (FormValidationException $exception) {
-                foreach ($exception->getErrors() as $path => $error) {
+                foreach ($exception->getErrors() as $path => $errors) {
                     $targetForm = is_string($path) ? $this->get('property_accessor')->getValue($form, $path) : $form;
-                    $targetForm->addError($error);
+                    foreach ((array) $errors as $error) {
+                        $targetForm->addError($error);
+                    }
                 }
             }
         }
