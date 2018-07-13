@@ -9,15 +9,7 @@ use Symfony\Component\Form\FormError;
  */
 class FormValidationException extends \RuntimeException
 {
-    /**
-     * @var FormError
-     */
-    protected $error;
-
-    /**
-     * @var null|string
-     */
-    protected $path;
+    protected $errors;
 
     /**
      * FormValidationException constructor.
@@ -25,10 +17,17 @@ class FormValidationException extends \RuntimeException
      * @param FormError $error
      * @param string    $path
      */
-    public function __construct(FormError $error, $path = null)
+    public function __construct($error, $path = null)
     {
-        $this->error = $error;
-        $this->path = $path;
+        if (count(func_get_args()) === 1 && is_array($error)) {
+            $this->errors = $error;
+        } else {
+            if ($path) {
+                $this->errors[$path] = $error;
+            } else {
+                $this->errors[] = $error;
+            }
+        }
 
         parent::__construct('Form controller validation exception');
     }
@@ -36,16 +35,8 @@ class FormValidationException extends \RuntimeException
     /**
      * @return FormError
      */
-    public function getError()
+    public function getErrors()
     {
-        return $this->error;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->path;
+        return $this->errors;
     }
 }
