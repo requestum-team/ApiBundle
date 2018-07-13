@@ -39,4 +39,25 @@ class FormValidationException extends \RuntimeException
     {
         return $this->errors;
     }
+
+    /**
+     * @return FormError
+     */
+    public function getError()
+    {
+        reset($this->errors);
+
+        return current($this->errors);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        reset($this->errors);
+        $key = key($this->errors);
+
+        return is_string($key) ? $key : null;
+    }
 }
