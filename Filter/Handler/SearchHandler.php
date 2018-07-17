@@ -42,23 +42,27 @@ class SearchHandler extends AbstractByNameHandler
 
         foreach ($this->getSearchFields() as $field) {
 
-            if(strpos($field, '~')) {
+            if(is_array($field)) {
 
-                $concatFields = explode('~', $field);
+                $concatPaths = [];
 
-                list($firstConcatFieldJoinColumn, $concatFields[0]) = $this->processPath($builder, $concatFields[0]);
-                list($secondConcatFieldJoinColumn, $concatFields[1]) = $this->processPath($builder, $concatFields[1]);
+                foreach ($field as $concatField) {
 
-                $whereExpr
-                    ->add(sprintf('CONCAT(%s.%s, \' \', %s.%s) LIKE :query', $firstConcatFieldJoinColumn, $concatFields[0], $secondConcatFieldJoinColumn, $concatFields[1]));
+                    [$concatFieldJoinColumn, $concatField] = $this->processPath($builder, $concatField);
+                    $concatPaths[] = $concatFieldJoinColumn.'.'.$concatField;
+                }
+
+                $concatExpr = implode(", ' ', ", $concatPaths);
+                $queryExpr = sprintf('CONCAT(%s)', $concatExpr);
 
             } else {
 
                 list($joinColumn, $field) = $this->processPath($builder, $field);
-
-                $whereExpr
-                    ->add(sprintf('%s.%s LIKE :query', $joinColumn, $field));
+                $queryExpr = $joinColumn.'.'.$field;
             }
+
+            $whereExpr
+                ->add(sprintf('%s LIKE :query', $queryExpr));
         }
 
         $builder
