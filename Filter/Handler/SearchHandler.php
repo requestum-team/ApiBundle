@@ -40,23 +40,25 @@ class SearchHandler extends AbstractByNameHandler
             ->expr()
             ->orX();
 
-        $joined = [];
         foreach ($this->getSearchFields() as $field) {
-            $prevJoinColumn = $joinColumn = $this->rootAlias;
 
-            while (false !== $dotPosition = strpos($field, '.')) {
-                $joinColumn = substr($field, 0, $dotPosition);
-                $field = substr($field, $dotPosition + 1);
+            if(strpos($field, '~')) {
 
-                if (!in_array($joinColumn, $joined, true)) {
-                    $joined[] = $joinColumn;
-                    QueryBuilderHelper::leftJoinOnce($builder, $prevJoinColumn.'.'.$joinColumn, $joinColumn, $this->rootAlias);
-                }
-                $prevJoinColumn = $joinColumn;
+                $concatFields = explode('~', $field);
+
+                list($firstConcatFieldJoinColumn, $concatFields[0]) = $this->processPath($builder, $concatFields[0]);
+                list($secondConcatFieldJoinColumn, $concatFields[1]) = $this->processPath($builder, $concatFields[1]);
+
+                $whereExpr
+                    ->add(sprintf('CONCAT(%s.%s, \' \', %s.%s) LIKE :query', $firstConcatFieldJoinColumn, $concatFields[0], $secondConcatFieldJoinColumn, $concatFields[1]));
+
+            } else {
+
+                list($joinColumn, $field) = $this->processPath($builder, $field);
+
+                $whereExpr
+                    ->add(sprintf('%s.%s LIKE :query', $joinColumn, $field));
             }
-
-            $whereExpr
-                ->add(sprintf('%s.%s LIKE :query', $joinColumn, $field));
         }
 
         $builder
@@ -97,5 +99,29 @@ class SearchHandler extends AbstractByNameHandler
     protected function getSearchFields()
     {
         return $this->searchFields;
+    }
+
+
+    /**
+     * Parse path, join tables, return last join column and field name
+     *
+     * @param QueryBuilder $builder
+     * @param string $path
+     * @return array
+     */
+    protected function processPath(QueryBuilder $builder, $path)
+    {
+        $joinColumn = $prevJoinColumn = $this->rootAlias;
+
+        while (false !== $dotPosition = strpos($path, '.')) {
+            $joinColumn = substr($path, 0, $dotPosition);
+            $path = substr($path, $dotPosition + 1);
+
+            QueryBuilderHelper::leftJoinOnce($builder, $prevJoinColumn.'.'.$joinColumn, $joinColumn, $this->rootAlias);
+
+            $prevJoinColumn = $joinColumn;
+        }
+
+        return [$joinColumn, $path];
     }
 }
