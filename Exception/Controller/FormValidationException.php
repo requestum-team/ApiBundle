@@ -25,7 +25,7 @@ class FormValidationException extends \RuntimeException
             if ($path) {
                 $this->errors[$path] = $error;
             } else {
-                $this->errors[] = $error;
+                $this->errors[0][] = $error;
             }
         }
 
