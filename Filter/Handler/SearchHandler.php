@@ -49,7 +49,7 @@ class SearchHandler extends AbstractByNameHandler
                 foreach ($field as $concatField) {
 
                     [$concatFieldJoinColumn, $concatField] = $this->processPath($builder, $concatField);
-                    $concatPaths[] = $concatFieldJoinColumn.'.'.$concatField;
+                    $concatPaths[] = sprintf("COALESCE(%s,'')", $concatFieldJoinColumn.'.'.$concatField);
                 }
 
                 $concatExpr = implode(", ' ', ", $concatPaths);
