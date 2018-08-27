@@ -58,10 +58,9 @@ abstract class AbstractFormAction extends EntityAction
      */
     public function executeAction(Request $request)
     {
-        $entity = $this->provideEntity($request);
-
         if ($this->options['use_lock']) {
             $this->get('doctrine.orm.default_entity_manager')->beginTransaction();
+            $entity = $this->provideEntity($request);
             try {
                 $response = $this->processEntity($request, $entity);
                 $this->get('doctrine.orm.default_entity_manager')->commit();
@@ -71,6 +70,7 @@ abstract class AbstractFormAction extends EntityAction
                 throw $exception;
             }
         } else {
+            $entity = $this->provideEntity($request);
             $response = $this->processEntity($request, $entity);
         }
 
