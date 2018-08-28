@@ -5,6 +5,7 @@ namespace Requestum\ApiBundle\Action;
 use Requestum\ApiBundle\Action\Extension\OptionsExtensionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -72,7 +73,7 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
 
         // no pass through context to decouple from concrete serializer implementation
         $context = [
-            'expand' => isset($serializationContext['expand']) ? $serializationContext['expand'] : [],
+            'expand' => $serializationContext['expand'],
             'groups' => isset($serializationContext['groups']) ? $serializationContext['groups'] : $this->options['serialization_groups']
         ];
 
@@ -91,16 +92,22 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
     }
 
     /**
-     * @param mixed $data
-     * @param int   $status
-     * @param array $serializationContext
+     * @param Request $request
+     * @param mixed   $data
+     * @param int     $status
+     * @param array   $serializationContext
      *
      * @return JsonResponse
      *
      * @throws \Exception
      */
-    protected function handleResponse($data, $status = Response::HTTP_OK, array $serializationContext = [])
+    protected function handleResponse($request, $data, $status = Response::HTTP_OK, array $serializationContext = [])
     {
+        $expandExpression = $request->query->get('expand') ? $request->query->get('expand') : null;
+        $expand = $expandExpression ? explode(',', $expandExpression) : [];
+
+        $serializationContext = $serializationContext + ['expand' => $expand];
+
         $body = null !== $data ? $this->serialize($data, (array) $serializationContext) : '';
 
         return new JsonResponse($body, $status, [], true);

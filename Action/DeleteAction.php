@@ -32,7 +32,7 @@ class DeleteAction extends EntityAction
             throw new BadRequestHttpException('Cannot delete entity due to constraint reference');
         }
 
-        return $this->handleResponse(null, Response::HTTP_NO_CONTENT);
+        return $this->handleResponse($request, null, Response::HTTP_NO_CONTENT);
     }
 
     /**

@@ -31,8 +31,6 @@ class ListAction extends EntityAction
 
         $page = $this->extractParam($filters, 'page', 1);
         $perPage = $this->extractParam($filters, 'per-page', $this->options['default_per_page']);
-        $expandExpression = $this->extractParam($filters, 'expand', null);
-        $expand = $expandExpression ? explode(',', $expandExpression) : [];
 
         try {
             $entitiesQueryBuilder = $this->createQueryBuilder($filters);
@@ -64,9 +62,7 @@ class ListAction extends EntityAction
             $result = ['total' => $result->getNbResults()];
         }
 
-        return $this->handleResponse($result, Response::HTTP_OK, [
-            'expand' => $expand
-        ]);
+        return $this->handleResponse($request, $result, Response::HTTP_OK);
     }
 
     /**
