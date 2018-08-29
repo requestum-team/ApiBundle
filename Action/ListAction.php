@@ -31,6 +31,7 @@ class ListAction extends EntityAction
 
         $page = $this->extractParam($filters, 'page', 1);
         $perPage = $this->extractParam($filters, 'per-page', $this->options['default_per_page']);
+        $expandExpression = $this->extractParam($filters, 'expand', null);
 
         try {
             $entitiesQueryBuilder = $this->createQueryBuilder($filters);
