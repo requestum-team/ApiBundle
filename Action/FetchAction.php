@@ -23,7 +23,6 @@ class FetchAction extends EntityAction
         $this->checkAccess($user);
 
         return $this->handleResponse(
-            $request,
             $user,
             Response::HTTP_OK
         );

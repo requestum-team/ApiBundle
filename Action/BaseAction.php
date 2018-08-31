@@ -92,7 +92,6 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
     }
 
     /**
-     * @param Request $request
      * @param mixed   $data
      * @param int     $status
      * @param array   $serializationContext
@@ -101,8 +100,9 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
      *
      * @throws \Exception
      */
-    protected function handleResponse($request, $data, $status = Response::HTTP_OK, array $serializationContext = [])
+    protected function handleResponse($data, $status = Response::HTTP_OK, array $serializationContext = [])
     {
+        $request = Request::createFromGlobals();
         $expandExpression = $request->query->get('expand') ? $request->query->get('expand') : null;
         $expand = $expandExpression ? explode(',', $expandExpression) : [];
 

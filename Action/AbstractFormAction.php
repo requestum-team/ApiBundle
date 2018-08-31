@@ -101,7 +101,7 @@ abstract class AbstractFormAction extends EntityAction
                 $this->processSubmit($request, $entity, $form);
                 $this->afterSave($request, $entity, $form);
 
-                return $this->handleResponse($request, $this->options['return_entity'] ? $entity : null, $this->options['success_status_code']);
+                return $this->handleResponse($this->options['return_entity'] ? $entity : null, $this->options['success_status_code']);
             } catch (FormValidationException $exception) {
                 foreach ($exception->getErrors() as $path => $errors) {
                     $targetForm = is_string($path) ? $this->get('property_accessor')->getValue($form, $path) : $form;
@@ -112,7 +112,7 @@ abstract class AbstractFormAction extends EntityAction
             }
         }
 
-        return $this->handleResponse($request, $form, Response::HTTP_UNPROCESSABLE_ENTITY);
+        return $this->handleResponse($form, Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**

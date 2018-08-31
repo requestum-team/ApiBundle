@@ -63,7 +63,7 @@ class ListAction extends EntityAction
             $result = ['total' => $result->getNbResults()];
         }
 
-        return $this->handleResponse($request, $result, Response::HTTP_OK);
+        return $this->handleResponse($result, Response::HTTP_OK);
     }
 
     /**
