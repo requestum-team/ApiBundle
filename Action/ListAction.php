@@ -85,6 +85,15 @@ class ListAction extends EntityAction
                 continue;
             }
 
+            if (is_array($value)) {
+                foreach ($value as $subFilter => $subValue) {
+                    if (!array_key_exists("[{$key}][{$subFilter}]", $this->options['filters'])) {
+                        $unknownParams[] = "[{$key}][{$subFilter}]";
+                        continue;
+                    }
+                }
+            }
+
             $filters[$key] = $this->processFilter($key, $value);
         }
 
