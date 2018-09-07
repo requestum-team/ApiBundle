@@ -27,7 +27,7 @@ class ListAction extends EntityAction
      */
     public function executeAction(Request $request)
     {
-        $filters = $this->getFilters($request);
+        $filters = $this->getFilters($request->query->all());
 
         $page = $this->extractParam($filters, 'page', 1);
         $perPage = $this->extractParam($filters, 'per-page', $this->options['default_per_page']);
@@ -70,31 +70,33 @@ class ListAction extends EntityAction
     }
 
     /**
-     * @param Request $request
-     *
+     * @param array $queryFilters
+     * @param null|string $parentFilter
      * @return array
+     *
      */
-    protected function getFilters(Request $request)
+    protected function getFilters(array $queryFilters, ?string $parentFilter = null)
     {
-        $filters = [];
-        $unknownParams = [];
+        static $filters = [];
+        static $unknownParams = [];
 
-        foreach ($request->query->all() as $key => $value) {
-            if (!array_key_exists($key, $this->options['filters'])) {
-                $unknownParams[] = '"'.$key.'"';
+        foreach ($queryFilters as $key => $value) {
+
+            $filter = $parentFilter ? "{$parentFilter}.{$key}" : $key;
+
+            if (is_array($value)) {
+
+                $this->getFilters($value, $filter);
                 continue;
             }
 
-            if (is_array($value)) {
-                foreach ($value as $subFilter => $subValue) {
-                    if (!array_key_exists("[{$key}][{$subFilter}]", $this->options['filters'])) {
-                        $unknownParams[] = "[{$key}][{$subFilter}]";
-                        continue;
-                    }
-                }
+            if (!array_key_exists($filter, $this->options['filters'])) {
+                $unknownParams[] = '"'.$filter.'"';
+                continue;
             }
 
-            $filters[$key] = $this->processFilter($key, $value);
+            $filters[$filter] = $this->processFilter($filter, $value);
+
         }
 
         if (count($unknownParams)) {
