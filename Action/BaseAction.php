@@ -102,7 +102,7 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
      */
     protected function handleResponse($data, $status = Response::HTTP_OK, array $serializationContext = [])
     {
-        $request = Request::createFromGlobals();
+        $request = $this->get('request_stack')->getCurrentRequest();
         $expandExpression = $request->query->get('expand') ? $request->query->get('expand') : null;
         $expand = $expandExpression ? explode(',', $expandExpression) : [];
 
