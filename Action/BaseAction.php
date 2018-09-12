@@ -125,10 +125,14 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
         return $result;
     }
 
-    protected function checkAccess($subject = null)
+    /**
+     * @param null   $subject
+     * @param string $message
+     */
+    protected function checkAccess($subject = null,  $message = 'Access Denied.')
     {
         if ($accessAttr = $this->options['access_attribute']) {
-            $this->denyAccessUnlessGranted($accessAttr, $subject);
+            $this->denyAccessUnlessGranted($accessAttr, $subject, $message);
         }
     }
 
