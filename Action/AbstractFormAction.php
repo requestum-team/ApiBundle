@@ -5,6 +5,7 @@ namespace Requestum\ApiBundle\Action;
 use Requestum\ApiBundle\Action\Extension\ValidationExtensionInterface;
 use Requestum\ApiBundle\Exception\Controller\FormValidationException;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -105,8 +106,13 @@ abstract class AbstractFormAction extends EntityAction
             } catch (FormValidationException $exception) {
                 foreach ($exception->getErrors() as $path => $errors) {
                     $targetForm = is_string($path) ? $this->get('property_accessor')->getValue($form, $path) : $form;
-                    foreach ((array) $errors as $error) {
-                        $targetForm->addError($error);
+
+                    if ($errors instanceof FormError) {
+                        $targetForm->addError($errors);
+                    } else {
+                        foreach ((array) $errors as $error) {
+                            $targetForm->addError($error);
+                        }
                     }
                 }
             }
