@@ -86,13 +86,13 @@ class ObjectNormalizer extends BaseObjectNormalizer
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
     {
-        $access = $this->resourceMetadataFactory->getPropertyMetadata($classOrObject, $attribute, Access::class);
-
         if (!($isAllowedAttribute = parent::isAllowedAttribute($classOrObject, $attribute, $format, $context))) {
             return $isAllowedAttribute;
         }
 
-        if ($context['check_access'] && isset($access->value)) {
+        $access = $this->resourceMetadataFactory->getPropertyMetadata($classOrObject, $attribute, Access::class);
+
+        if ($context['check_access'] && $access) {
             return $this->checkAccess($context['object'], $access->value);
         }
 
