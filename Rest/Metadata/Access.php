@@ -5,7 +5,7 @@ namespace Requestum\ApiBundle\Rest\Metadata;
 use Doctrine\Common\Annotations\Annotation;
 
 /**
- * Access annotation for hiding property when normalization object for user who does not own object
+ * Access annotation to delegate making a decision to normalize the field in the access decision manager
  *
  * @Annotation
  *

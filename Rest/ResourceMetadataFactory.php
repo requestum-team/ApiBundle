@@ -88,11 +88,11 @@ class ResourceMetadataFactory
 
         $propertyAnnotations = isset($loadedClasses['properties'][$property]) ? $loadedClasses['properties'][$property] : [];
 
-        if (!($targetMetadata && isset($propertyAnnotations[$targetMetadata]))) {
+        if (!$targetMetadata) {
             return $propertyAnnotations;
         }
 
-        return $propertyAnnotations[$targetMetadata];
+        return isset($propertyAnnotations[$targetMetadata]) ? $propertyAnnotations[$targetMetadata] : null;
     }
 
     /**

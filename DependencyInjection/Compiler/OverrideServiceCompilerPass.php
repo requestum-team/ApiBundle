@@ -33,7 +33,7 @@ class OverrideServiceCompilerPass implements CompilerPassInterface
                 ]
             )
             ->addMethodCall(
-                'setAnnotationReader',
+                'setResourceMetadataFactory',
                 [
                     $container->getDefinition('core.resourse.metadata_factory'),
                 ]
