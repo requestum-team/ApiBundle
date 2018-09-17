@@ -32,7 +32,7 @@ class ObjectNormalizer extends BaseObjectNormalizer
     /**
      * @var ResourceMetadataFactory
      */
-    protected $reader;
+    protected $resourceMetadataFactory;
 
     /**
      * @param AttributeExtractionStrategy $attributeExtractionStrategy
@@ -56,11 +56,11 @@ class ObjectNormalizer extends BaseObjectNormalizer
 
 
     /**
-     * @param ResourceMetadataFactory $reader
+     * @param ResourceMetadataFactory $resourceMetadataFactory
      */
-    public function setAnnotationReader(ResourceMetadataFactory $reader)
+    public function setResourceMetadataFactory(ResourceMetadataFactory $resourceMetadataFactory)
     {
-        $this->reader = $reader;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -86,15 +86,28 @@ class ObjectNormalizer extends BaseObjectNormalizer
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
     {
-        $access = $this->reader->getPropertyMetadata($classOrObject, $attribute, Access::class);
+        $access = $this->resourceMetadataFactory->getPropertyMetadata($classOrObject, $attribute, Access::class);
 
-        if ($access instanceof Access && ($attributes = $access->value)) {
-            $attributes = is_array($attributes) ? $attributes : [$attributes];
-
-            return $this->authorizationChecker->isGranted($attributes, $context['object']);
+        if (!($isAllowedAttribute = parent::isAllowedAttribute($classOrObject, $attribute, $format, $context))) {
+            return $isAllowedAttribute;
         }
 
-        return parent::isAllowedAttribute($classOrObject, $attribute, $format, $context);
+        if ($context['check_access'] && isset($access->value)) {
+            return $this->checkAccess($context['object'], $access->value);
+        }
+
+        return $isAllowedAttribute;
+    }
+
+    /**
+     * @param $object
+     * @param $attributes
+     *
+     * @return mixed
+     */
+    protected function checkAccess($object, $attributes)
+    {
+        return $this->authorizationChecker->isGranted($attributes, $object);
     }
 
     /**
@@ -111,7 +124,7 @@ class ObjectNormalizer extends BaseObjectNormalizer
         $current = null;
         if ($object instanceof ReferenceWrapper) {
             $current = $object->getAttribute();
-            $context['path'] = isset($context['path']) ? $context['path'].'.'.$current : $current;
+            $context['path'] = isset($context['path']) ? $context['path'] . '.' . $current : $current;
 
             return $this->serializer->normalize($object->getObject(), $format, $context);
         }
