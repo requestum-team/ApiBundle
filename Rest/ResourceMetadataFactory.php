@@ -80,7 +80,7 @@ class ResourceMetadataFactory
      * @param      $property
      * @param null $targetMetadata
      *
-     * @return array
+     * @return Annotation[]|Annotation|null
      */
     public function getPropertyMetadata($object, $property, $targetMetadata = null)
     {

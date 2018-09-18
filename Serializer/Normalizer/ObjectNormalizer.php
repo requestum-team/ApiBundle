@@ -86,28 +86,27 @@ class ObjectNormalizer extends BaseObjectNormalizer
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
     {
-        if (!($isAllowedAttribute = parent::isAllowedAttribute($classOrObject, $attribute, $format, $context))) {
-            return $isAllowedAttribute;
-        }
-
-        $access = $this->resourceMetadataFactory->getPropertyMetadata($classOrObject, $attribute, Access::class);
-
-        if ($context['check_access'] && $access) {
-            return $this->checkAccess($context['object'], $access->value);
-        }
-
-        return $isAllowedAttribute;
+        return parent::isAllowedAttribute($classOrObject, $attribute, $format, $context) &&
+            (
+                !(isset($context['serialization_check_access']) && $context['serialization_check_access']) ||
+                $this->checkAccess($classOrObject, $attribute, $context)
+            );
     }
 
     /**
-     * @param $object
-     * @param $attributes
+     * @param $classOrObject
+     * @param $attribute
+     * @param $context
      *
-     * @return mixed
+     * @return bool
      */
-    protected function checkAccess($object, $attributes)
+    protected function checkAccess($classOrObject, $attribute, $context)
     {
-        return $this->authorizationChecker->isGranted($attributes, $object);
+        if ($access = $this->resourceMetadataFactory->getPropertyMetadata($classOrObject, $attribute, Access::class)) {
+            return $this->authorizationChecker->isGranted($access->value, $context['object']);
+        }
+
+        return true;
     }
 
     /**

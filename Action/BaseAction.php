@@ -74,7 +74,7 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
         $context = [
             'expand' => isset($serializationContext['expand']) ? $serializationContext['expand'] : [],
             'groups' => isset($serializationContext['groups']) ? $serializationContext['groups'] : $this->options['serialization_groups'],
-            'check_access' => isset($serializationContext['check_access']) ? $serializationContext['check_access'] : $this->options['check_access'],
+            'serialization_check_access' => isset($serializationContext['serialization_check_access']) ? $serializationContext['serialization_check_access'] : $this->options['serialization_check_access'],
         ];
 
         try {
@@ -141,7 +141,7 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
         $resolver->setDefaults([
             'serialization_groups' => ['default'],
             'access_attribute' => null,
-            'check_access' => true,
+            'serialization_check_access' => true,
         ]);
     }
 }
