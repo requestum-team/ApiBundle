@@ -74,7 +74,8 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
         // no pass through context to decouple from concrete serializer implementation
         $context = [
             'expand' => $serializationContext['expand'],
-            'groups' => isset($serializationContext['groups']) ? $serializationContext['groups'] : $this->options['serialization_groups']
+            'groups' => isset($serializationContext['groups']) ? $serializationContext['groups'] : $this->options['serialization_groups'],
+            'serialization_check_access' => isset($serializationContext['serialization_check_access']) ? $serializationContext['serialization_check_access'] : $this->options['serialization_check_access'],
         ];
 
         try {
@@ -92,9 +93,9 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
     }
 
     /**
-     * @param mixed   $data
-     * @param int     $status
-     * @param array   $serializationContext
+     * @param mixed $data
+     * @param int   $status
+     * @param array $serializationContext
      *
      * @return JsonResponse
      *
@@ -146,7 +147,8 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
     {
         $resolver->setDefaults([
             'serialization_groups' => ['default'],
-            'access_attribute' => null
+            'access_attribute' => null,
+            'serialization_check_access' => true,
         ]);
     }
 }

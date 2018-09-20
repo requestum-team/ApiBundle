@@ -76,16 +76,23 @@ class ResourceMetadataFactory
     }
 
     /**
-     * @param string|object $object
-     * @param string        $property
+     * @param      $object
+     * @param      $property
+     * @param null $targetMetadata
      *
-     * @return array
+     * @return Annotation[]|Annotation|null
      */
-    public function getPropertyMetadata($object, $property)
+    public function getPropertyMetadata($object, $property, $targetMetadata = null)
     {
         $loadedClasses = $this->getClassMetadata($object);
 
-        return isset($loadedClasses['properties'][$property]) ? $loadedClasses['properties'][$property]:[];
+        $propertyAnnotations = isset($loadedClasses['properties'][$property]) ? $loadedClasses['properties'][$property] : [];
+
+        if (!$targetMetadata) {
+            return $propertyAnnotations;
+        }
+
+        return isset($propertyAnnotations[$targetMetadata]) ? $propertyAnnotations[$targetMetadata] : null;
     }
 
     /**

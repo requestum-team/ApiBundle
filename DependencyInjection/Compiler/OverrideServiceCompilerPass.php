@@ -7,8 +7,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Requestum\ApiBundle\Serializer\Normalizer\ObjectNormalizer;
 
+/**
+ * Class OverrideServiceCompilerPass
+ */
 class OverrideServiceCompilerPass implements CompilerPassInterface
 {
+    /**
+     * @param ContainerBuilder $container
+     */
     public function process(ContainerBuilder $container)
     {
         $definition = $container->getDefinition('serializer.normalizer.object');
@@ -17,7 +23,19 @@ class OverrideServiceCompilerPass implements CompilerPassInterface
             ->addMethodCall(
                 'setAttributeExtractionStrategy',
                 [
-                    $container->getDefinition('core.resourse.attribute_extraction_strategy')
+                    $container->getDefinition('core.resourse.attribute_extraction_strategy'),
+                ]
+            )
+            ->addMethodCall(
+                'setAuthorizationChecker',
+                [
+                    $container->getDefinition('security.authorization_checker'),
+                ]
+            )
+            ->addMethodCall(
+                'setResourceMetadataFactory',
+                [
+                    $container->getDefinition('core.resourse.metadata_factory'),
                 ]
             )
         ;
