@@ -224,9 +224,11 @@ abstract class EntityAction extends BaseAction
     public function initContextFilter($params, RequestStack $requestStack)
     {
         $request = $requestStack->getCurrentRequest();
-        if ($request->get($this->options['parent_fetch_field'])) {
-            $entityContextData = new EntityContextData($this->getDoctrine()->getRepository($params['context'])->find($request->get($this->options['parent_fetch_field'])));
+        if ($request->get($this->options['parent_fetch_field']) && $entity = $this->getDoctrine()->getRepository($params['context'])->find($request->get($this->options['parent_fetch_field']))) {
+            $entityContextData = new EntityContextData($entity);
             $this->addContextData($params['context_field'], $entityContextData);
+        } else {
+            throw new NotFoundHttpException('Context "' . $params['context_field'] . '" not found');
         }
     }
 }
