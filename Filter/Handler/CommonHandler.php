@@ -3,6 +3,7 @@
 namespace Requestum\ApiBundle\Filter\Handler;
 
 use Doctrine\ORM\QueryBuilder;
+use Requestum\ApiBundle\Filter\ContextDataInterface;
 use Requestum\ApiBundle\Util\QueryBuilderHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -83,6 +84,10 @@ class CommonHandler extends AbstractHandler
                 } else {
                     $this->addWhere($query, $field.'.'.$subField, $subValue);
                 }
+            }
+        } elseif ($value instanceof ContextDataInterface) {
+            foreach ($value->getFilters() as $k => $v) {
+                $this->addWhere($query, $field, $v);
             }
         } else {
             $value = $value === 'true' ? true : $value;

@@ -8,9 +8,11 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Requestum\ApiBundle\Action\Extension\FiltersExtensionInterface;
 use Requestum\ApiBundle\Action\Extension\OptionsExtensionInterface;
+use Requestum\ApiBundle\Filter\EntityContextData;
 use Requestum\ApiBundle\Repository\FilterableRepositoryInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -25,6 +27,11 @@ abstract class EntityAction extends BaseAction
      * @var string
      */
     protected $entityClass;
+
+    /**
+     * @var EntityContextData[]
+     */
+    protected $arrayContextData;
 
     /**
      * @var FiltersExtensionInterface[]
@@ -116,6 +123,8 @@ abstract class EntityAction extends BaseAction
      */
     protected function createQueryBuilder(array $filters = [])
     {
+        $filters += $this->getContextData();
+
         $repository = $this->getDoctrine()->getRepository($this->entityClass);
 
         if  ($repository instanceof ContainerAwareInterface) {
@@ -180,6 +189,44 @@ abstract class EntityAction extends BaseAction
         $resolver->setDefaults([
             'fetch_field' => 'id',
             'preset_filters' => [],
+            'parent_fetch_field' => 'parent_id',
         ]);
+    }
+
+    /**
+     * @return EntityContextData[]
+     */
+    public function getContextData(): array
+    {
+        return $this->arrayContextData;
+    }
+
+    /**
+     * @return self
+     */
+    public function setContextData($arrayContextData): self
+    {
+        $this->arrayContextData = $arrayContextData;
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    public function addContextData($field, EntityContextData $value): self
+    {
+        $this->arrayContextData[$field] = $value;
+
+        return $this;
+    }
+
+    public function initContextFilter($params, RequestStack $requestStack)
+    {
+        $request = $requestStack->getCurrentRequest();
+        if ($request->get($this->options['parent_fetch_field'])) {
+            $entityContextData = new EntityContextData($this->getDoctrine()->getRepository($params['context'])->find($request->get($this->options['parent_fetch_field'])));
+            $this->addContextData($params['context_field'], $entityContextData);
+        }
     }
 }

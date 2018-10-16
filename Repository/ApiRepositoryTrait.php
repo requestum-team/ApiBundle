@@ -49,7 +49,6 @@ trait ApiRepositoryTrait
                 }
             }
         }
-
         return $builder;
     }
 

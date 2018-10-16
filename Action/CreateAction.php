@@ -5,6 +5,7 @@ namespace Requestum\ApiBundle\Action;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Class CreateAction.
@@ -16,7 +17,15 @@ class CreateAction extends AbstractFormAction
      */
     protected function provideEntity(Request $request)
     {
-        return new $this->entityClass(); // @codingStandardsIgnoreLine
+        $newEntity = new $this->entityClass();
+
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+        foreach ($this->getContextData() as $field => $contextData) {
+            $propertyAccessor->setValue($newEntity, $field, $contextData->getValue());
+        }
+
+        return $newEntity;
     }
 
     /**
