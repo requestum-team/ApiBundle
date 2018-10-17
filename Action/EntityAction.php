@@ -123,8 +123,6 @@ abstract class EntityAction extends BaseAction
      */
     protected function createQueryBuilder(array $filters = [])
     {
-        $filters += $this->getContextData();
-
         $repository = $this->getDoctrine()->getRepository($this->entityClass);
 
         if  ($repository instanceof ContainerAwareInterface) {
@@ -193,38 +191,12 @@ abstract class EntityAction extends BaseAction
         ]);
     }
 
-    /**
-     * @return EntityContextData[]
-     */
-    public function getContextData(): array
-    {
-        return $this->arrayContextData;
-    }
-
-    /**
-     * @return self
-     */
-    public function setContextData($arrayContextData): self
-    {
-        $this->arrayContextData = $arrayContextData;
-
-        return $this;
-    }
-
-    /**
-     * @return self
-     */
-    public function addContextData($field, EntityContextData $value): self
-    {
-        $this->arrayContextData[$field] = $value;
-
-        return $this;
-    }
-
     public function initContextFilter($params)
     {
-        $request =  $this->get('request_stack')->getCurrentRequest();
+        $request = $this->get('request_stack')->getCurrentRequest();
         if ($request->get($this->options['parent_fetch_field']) && $entity = $this->getDoctrine()->getRepository($params['context'])->find($request->get($this->options['parent_fetch_field']))) {
+            $this->denyAccessUnlessGranted($this->options['context'], $entity);
+
             $entityContextData = new EntityContextData($entity, $this->get('core.filter.entity_context_helper'));
             $this->addContextData($params['context_field'], $entityContextData);
         } else {

@@ -102,6 +102,8 @@ class CommonHandler extends AbstractHandler
 
             $this->addWhere($query, $field, $value);
         }
+
+        $dql = $query->getDQL();
     }
 
     /**

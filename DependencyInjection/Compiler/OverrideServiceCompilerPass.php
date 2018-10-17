@@ -2,6 +2,7 @@
 
 namespace Requestum\ApiBundle\DependencyInjection\Compiler;
 
+use Requestum\ApiBundle\Action\ActionContextDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,9 +27,13 @@ class OverrideServiceCompilerPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds('action.subresource');
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $tagParams) {
-                $serviceDefinition =  $container->findDefinition($id);
-                $serviceDefinition
-                    ->addMethodCall('initContextFilter', [$tagParams]);
+                $idServiceDecorator = 'core.action.subresource_decorator.'.$id;
+                $container
+                    ->register($idServiceDecorator, ActionContextDecorator::class)
+                    ->setDecoratedService($id)
+                    ->setPublic(false)
+                    ->addArgument(new Reference($idServiceDecorator.'.inner'))
+//                    ->addMethodCall('configureOptions', [$tagParams])
                 ;
             }
         }
