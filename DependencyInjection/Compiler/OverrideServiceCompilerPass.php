@@ -24,15 +24,13 @@ class OverrideServiceCompilerPass implements CompilerPassInterface
         ;
 
         $taggedServices = $container->findTaggedServiceIds('action.subresource');
-        $referenceRequestStack = new Reference('request_stack');
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $tagParams) {
                 $serviceDefinition =  $container->findDefinition($id);
                 $serviceDefinition
-                    ->addMethodCall('initContextFilter', [$tagParams, $referenceRequestStack]);
+                    ->addMethodCall('initContextFilter', [$tagParams]);
                 ;
             }
         }
-
     }
 }

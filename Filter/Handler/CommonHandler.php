@@ -86,8 +86,15 @@ class CommonHandler extends AbstractHandler
                 }
             }
         } elseif ($value instanceof ContextDataInterface) {
-            foreach ($value->getFilters() as $k => $v) {
-                $this->addWhere($query, $field, $v);
+            $filters = $value->getFilters();
+            if (count($filters) === 1) {
+                $this->addWhere($query, $field, $filters[key($filters)]);
+            } else {
+                $join = $parentAlias.$field;
+                $query->leftJoin($join, $field);
+                foreach ($filters as $subField => $subValue) {
+                    $this->addWhere($query, $field.'.'.$subField, $subValue);
+                }
             }
         } else {
             $value = $value === 'true' ? true : $value;
