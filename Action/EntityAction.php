@@ -12,7 +12,6 @@ use Requestum\ApiBundle\Filter\EntityContextData;
 use Requestum\ApiBundle\Repository\FilterableRepositoryInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -123,6 +122,8 @@ abstract class EntityAction extends BaseAction
      */
     protected function createQueryBuilder(array $filters = [])
     {
+        $filters += $this->getContexts();
+
         $repository = $this->getDoctrine()->getRepository($this->entityClass);
 
         if  ($repository instanceof ContainerAwareInterface) {
@@ -191,16 +192,16 @@ abstract class EntityAction extends BaseAction
         ]);
     }
 
-    public function initContextFilter($params)
+    /** EntityContextData[] */
+    public function getContexts()
     {
-        $request = $this->get('request_stack')->getCurrentRequest();
-        if ($request->get($this->options['parent_fetch_field']) && $entity = $this->getDoctrine()->getRepository($params['context'])->find($request->get($this->options['parent_fetch_field']))) {
-            $this->denyAccessUnlessGranted($this->options['context'], $entity);
+        $contexts = $this->get('request_stack')->getCurrentRequest()->attributes->get('_contexts');
 
-            $entityContextData = new EntityContextData($entity, $this->get('core.filter.entity_context_helper'));
-            $this->addContextData($params['context_field'], $entityContextData);
-        } else {
-            throw new NotFoundHttpException('Context "' . $params['context_field'] . '" not found');
-        }
+        return $contexts ?: [];
+    }
+
+    public function getEntityClass()
+    {
+        return $this->entityClass;
     }
 }

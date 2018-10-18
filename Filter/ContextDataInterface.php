@@ -18,4 +18,9 @@ interface ContextDataInterface
      * @return \stdClass
      */
     public function getValue();
+
+    /**
+     * @return string
+     */
+    public function getField();
 }

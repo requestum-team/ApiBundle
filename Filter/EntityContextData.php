@@ -2,9 +2,6 @@
 
 namespace Requestum\ApiBundle\Filter;
 
-use Requestum\ApiBundle\Filter\Helper\EntityContextHelper;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 /**
  * Class EntityContextData
  *
@@ -12,33 +9,31 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class EntityContextData implements ContextDataInterface
 {
-    private $helper;
-
     private $entity;
 
-    private $filters = null;
+    private $field;
 
-    public function __construct($entity, EntityContextHelper $helper)
+    private $filters;
+
+    public function __construct($field, $entity, $filters)
     {
-        $this->helper = $helper;
+        $this->filters = $filters;
         $this->entity = $entity;
+        $this->field = $field;
     }
 
     public function getFilters()
     {
-        if ($this->filters === null) {
-            $this->filters = [];
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
-            foreach ($this->helper->getEntityKeys($this->entity) as $column) {
-                $this->filters[$column] =  $propertyAccessor->getValue($this->entity, $column);
-            }
-        }
-
         return $this->filters;
     }
 
     public function getValue()
     {
         return $this->entity;
+    }
+
+    public function getField()
+    {
+        return $this->field;
     }
 }

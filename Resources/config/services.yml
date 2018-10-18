@@ -41,9 +41,3 @@ services:
         arguments: ["@core.util.error_factory"]
         tags:
             - { name: serializer.normalizer }
-
-    core.filter.entity_context_helper:
-        public: true
-        class: Requestum\ApiBundle\Filter\Helper\EntityContextHelper
-        arguments:
-            - '@doctrine.orm.entity_manager'

@@ -2,6 +2,7 @@
 
 namespace Requestum\ApiBundle\Action;
 
+use Requestum\ApiBundle\Filter\EntityContextData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,8 +22,12 @@ class CreateAction extends AbstractFormAction
 
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
-        foreach ($this->getContextData() as $field => $contextData) {
-            $propertyAccessor->setValue($newEntity, $field, $contextData->getValue());
+        /**
+         * @var string $field
+         * @var EntityContextData $contextData
+         */
+        foreach ($this->getContexts() as $field => $contextData) {
+            $propertyAccessor->setValue($newEntity, $contextData->getField(), $contextData->getValue());
         }
 
         return $newEntity;

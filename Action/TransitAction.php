@@ -89,5 +89,4 @@ class TransitAction extends UpdateAction
             'transitions' => [],
         ]);
     }
-
 }
