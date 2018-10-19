@@ -35,7 +35,8 @@
     "white-october/pagerfanta-bundle": "^1.0",
     "doctrine/doctrine-bundle": "^1.6",
     "doctrine/orm": "^2.5",
-    "symfony/yaml": "^3.0 || ^4.1"
+    "symfony/yaml": "^3.0 || ^4.1",
+    "symfony/security-bundle": "^3.0 || ^4.1"
   },
   "autoload": {
     "psr-4": {
