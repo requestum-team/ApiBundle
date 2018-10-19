@@ -7,7 +7,6 @@ use Doctrine\Common\Annotations\AnnotationReader;
 
 use Requestum\ApiBundle\Rest\ResourceMetadataFactory;
 use Requestum\ApiBundle\Rest\Metadata\Reference;
-use Requestum\ApiBundle\Rest\Metadata\UserScoped;
 
 class TestObject
 {
