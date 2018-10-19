@@ -29,9 +29,8 @@ class ListAction extends EntityAction
     {
         $filters = $this->getFilters($request);
 
-        $page = $this->extractParam($filters, 'page', 1);
-        $perPage = $this->extractParam($filters, 'per-page', $this->options['default_per_page']);
-        $expandExpression = $this->extractParam($filters, 'expand', null);
+        $page = $request->query->get( 'page', 1);
+        $perPage = $request->query->get( 'per-page', $this->options['default_per_page']);
 
         try {
             $entitiesQueryBuilder = $this->createQueryBuilder($filters);
@@ -75,8 +74,13 @@ class ListAction extends EntityAction
     {
         $filters = [];
         $unknownParams = [];
+        $reservedFilters = ['page', 'per-page', 'expand'];
 
         foreach ($request->query->all() as $key => $value) {
+            if (in_array($key, $reservedFilters)) {
+                continue;
+            }
+
             if (!array_key_exists($key, $this->options['filters'])) {
                 $unknownParams[] = '"'.$key.'"';
                 continue;
@@ -125,29 +129,14 @@ class ListAction extends EntityAction
         ]);
 
         $resolver->setNormalizer('filters', function (Options $options, $value) {
-            $reservedFilters = [
-                'page' => null,
-                'per-page' => null,
-                'expand' => null,
-            ];
-            $reservedOverrides = [];
             $result = [];
 
             foreach ($value as $filter) {
                 list($key, $processor) = is_array($filter) ? $filter : [$filter, null];
-
-                if (isset($reservedFilters[$key])) {
-                    $reservedOverrides[] = $key;
-                }
-
                 $result[$key] = $processor;
             }
 
-            if (count($reservedOverrides)) {
-                throw new \InvalidArgumentException(sprintf('next filters are reserved by ListAction: ["%s"]', implode('", "', $reservedOverrides)));
-            }
-
-            return $result + $reservedFilters;
+            return $result;
         });
     }
 
