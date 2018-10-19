@@ -53,14 +53,14 @@ class AttributeExtractionStrategy
             return $propertyValue;
         }
 
+        if ($this->isExpand($attribute, $context)) {
+            return new ReferenceWrapper($propertyValue, $attribute);
+        }
+        
         $propertyMetadata = $this->resourseMetadaFactory->getPropertyMetadata($object, $attribute);
 
         if (!($referenceMetadata = isset($propertyMetadata[Reference::class]) ? $propertyMetadata[Reference::class] : null)) {
             return $propertyValue;
-        }
-
-        if ($this->isExpand($attribute, $context)) {
-            return new ReferenceWrapper($propertyValue, $attribute);
         }
 
         $property = $referenceMetadata->field;
