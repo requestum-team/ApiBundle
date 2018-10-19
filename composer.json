@@ -37,6 +37,11 @@
     "doctrine/orm": "^2.5",
     "symfony/yaml": "^3.0"
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "Tests/"
+    }
+  },
   "autoload": {
     "psr-4": {
       "Requestum\\ApiBundle\\": ""
@@ -48,5 +53,8 @@
       "type": "git",
       "url": "https://github.com/requestum-team/ApiBundle.git"
     }
-  ]
+  ],
+  "require-dev": {
+    "phpunit/phpunit": "5.6"
+  }
 }

@@ -56,7 +56,7 @@ class ListAction extends EntityAction
         try {
             $result = $this->getPager($entitiesQueryBuilder, $perPage, $page);
         } catch (InvalidArgumentException $exception) {
-            throw new BadRequestHttpException();
+            throw new BadRequestHttpException($exception->getMessage());
         }
 
         if ($request->attributes->get('count-only')) {

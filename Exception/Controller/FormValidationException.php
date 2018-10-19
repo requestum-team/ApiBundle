@@ -14,8 +14,8 @@ class FormValidationException extends \RuntimeException
     /**
      * FormValidationException constructor.
      *
-     * @param FormError $error
-     * @param string    $path
+     * @param FormError|FormError[] $error
+     * @param string|null           $path
      */
     public function __construct($error, $path = null)
     {
@@ -23,7 +23,7 @@ class FormValidationException extends \RuntimeException
             $this->errors = $error;
         } else {
             if ($path) {
-                $this->errors[$path] = $error;
+                $this->errors[$path] = is_array($error) ? $error : [$error];
             } else {
                 $this->errors[0][] = $error;
             }
