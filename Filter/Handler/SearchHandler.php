@@ -37,15 +37,29 @@ class SearchHandler extends AbstractByNameHandler
      */
     public function handle(QueryBuilder $builder, $filter, $value)
     {
+        if (is_array($value)) {
+
+            if (!isset($value['fields'])) {
+                throw new BadRequestHttpException('Wrong query format. No search fields specified.');
+            }
+
+            if (!isset($value['term'])) {
+                throw new BadRequestHttpException('Wrong query format. No search term specified.');
+            }
+
+            $fields = explode(',', $value['fields']);
+            $value = $value['term'];
+        }
+
         $whereExpr = $builder
             ->expr()
             ->orX();
 
-        $searchFields = $this->getSearchFields($value);
+        $searchFields = $this->getSearchFields($fields ?? null);
 
         foreach ($searchFields as $field) {
 
-            if(is_array($field)) {
+            if (is_array($field)) {
 
                 $concatPaths = [];
 
@@ -80,15 +94,6 @@ class SearchHandler extends AbstractByNameHandler
      */
     protected function formatValue($value)
     {
-        if(is_array($value)) {
-
-            if (!isset($value['term'])) {
-                throw new BadRequestHttpException('Wrong query format. No search term specified.');
-            }
-
-            $value = $value['term'];
-        }
-
         if ($value[0] === '*') {
             $value[0] = '%';
         }
@@ -109,21 +114,16 @@ class SearchHandler extends AbstractByNameHandler
     }
 
     /**
-     * @param $value
+     * @param $queryFields
      * @return array Returns list for fields to search. Supports fields in referenced entities in following format: "reference.reference_field",
      *               reference deep is unlimited, so in this case "vehicle.vehicleModel.name" two joins will be performed
      */
-    protected function getSearchFields($value = null)
+    protected function getSearchFields($queryFields = null)
     {
-        if (!is_array($value)) {
+        if (!$queryFields) {
             return $this->searchFields;
         }
 
-        if (!isset($value['fields'])) {
-            throw new BadRequestHttpException('Wrong query format. No search fields specified.');
-        }
-
-        $queryFields = explode(',',$value['fields']);
         $fields = [];
 
         foreach ($this->searchFields as $key => $searchField) {
@@ -136,7 +136,7 @@ class SearchHandler extends AbstractByNameHandler
         }
 
         if (!empty($queryFields)) {
-            throw new BadRequestHttpException('Undefined query fields: '.implode(', ',$queryFields));
+            throw new BadRequestHttpException('Undefined query fields: '.implode(', ', $queryFields));
         }
 
         return $fields;
