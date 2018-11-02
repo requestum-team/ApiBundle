@@ -115,32 +115,31 @@ class SearchHandler extends AbstractByNameHandler
      */
     protected function getSearchFields($value = null)
     {
-        if (is_array($value)) {
-
-            if (!isset($value['fields'])) {
-                throw new BadRequestHttpException('Wrong query format. No search fields specified.');
-            }
-
-            $queryFields = explode(',',$value['fields']);
-            $fields = [];
-
-            foreach ($this->searchFields as $key => $searchField) {
-                $fieldName = is_array($searchField) ? $key : $searchField;
-
-                if (($fieldKey = array_search($fieldName, $queryFields)) !== false) {
-                    $fields[] = $searchField;
-                    unset($queryFields[$fieldKey]);
-                }
-            }
-
-            if (!empty($queryFields)) {
-                throw new BadRequestHttpException('Undefined query fields: '.implode(', ',$queryFields));
-            }
-
-            return $fields;
-        } else {
+        if (!is_array($value)) {
             return $this->searchFields;
         }
+
+        if (!isset($value['fields'])) {
+            throw new BadRequestHttpException('Wrong query format. No search fields specified.');
+        }
+
+        $queryFields = explode(',',$value['fields']);
+        $fields = [];
+
+        foreach ($this->searchFields as $key => $searchField) {
+            $fieldName = is_array($searchField) ? $key : $searchField;
+
+            if (($fieldKey = array_search($fieldName, $queryFields)) !== false) {
+                $fields[] = $searchField;
+                unset($queryFields[$fieldKey]);
+            }
+        }
+
+        if (!empty($queryFields)) {
+            throw new BadRequestHttpException('Undefined query fields: '.implode(', ',$queryFields));
+        }
+
+        return $fields;
     }
 
 
