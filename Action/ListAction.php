@@ -73,24 +73,13 @@ class ListAction extends EntityAction
     protected function getFilters(Request $request)
     {
         $filters = [];
-        $unknownParams = [];
-        $reservedFilters = ['page', 'per-page', 'expand'];
 
         foreach ($request->query->all() as $key => $value) {
-            if (in_array($key, $reservedFilters)) {
-                continue;
-            }
-
-            if (!array_key_exists($key, $this->options['filters'])) {
-                $unknownParams[] = '"'.$key.'"';
+            if (in_array($key, $this->options['reserved_filters'])) {
                 continue;
             }
 
             $filters[$key] = $this->processFilter($key, $value);
-        }
-
-        if (count($unknownParams)) {
-            throw new BadRequestHttpException(sprintf('Unknown parameters: %s', implode(' ,', $unknownParams)));
         }
 
         return $filters;
@@ -126,13 +115,25 @@ class ListAction extends EntityAction
             'filters' => [],
             'pagerfanta_fetch_join_collection' => false,
             'pagerfanta_use_output_walkers' => null,
+            'reserved_filters' => [
+                'page',
+                'per-page',
+                'expand'
+            ],
         ]);
 
         $resolver->setNormalizer('filters', function (Options $options, $value) {
             $result = [];
 
+            $reservedFilters = $options->offsetGet('reserved_filters');
+
             foreach ($value as $filter) {
                 list($key, $processor) = is_array($filter) ? $filter : [$filter, null];
+
+                if (in_array($key, $reservedFilters)) {
+                    continue;
+                }
+
                 $result[$key] = $processor;
             }
 
