@@ -262,23 +262,22 @@ class PaginationCursor
             $andEqualityCondition = $qb->expr()->andX();
             $andDifferenceCondition = $qb->expr()->andX();
 
-            $queryParameters = [];
-
             foreach ($this->getSortFields() as $key => $field) {
-                if (!preg_match('/./', $field['fieldName'])) {
+                $parametersKey = $qb->getParameters()->count() + $key;
+                if (!preg_match('/\./', $field['fieldName'])) {
                     $field['fieldName'] = $rootAlias . '.' . $field['fieldName'];
                 }
 
-                $andEqualityCondition->add($qb->expr()->eq($field['fieldName'], '?' . $key));
+                $andEqualityCondition->add($qb->expr()->eq($field['fieldName'], '?' . $parametersKey));
 
 
                 if ($this->isConditionMore($field['sortType'])) {
-                    $andDifferenceCondition->add($qb->expr()->gt($field['fieldName'], '?' . $key));
+                    $andDifferenceCondition->add($qb->expr()->gt($field['fieldName'], '?' . $parametersKey));
                 } else {
-                    $andDifferenceCondition->add($qb->expr()->lt($field['fieldName'], '?' . $key));
+                    $andDifferenceCondition->add($qb->expr()->lt($field['fieldName'], '?' . $parametersKey));
                 }
 
-                $queryParameters[$key] = $field['fieldValue'];
+                $qb->setParameter($parametersKey, $field['fieldValue']);
             }
 
             if ($this->isForward()) {
@@ -293,13 +292,12 @@ class PaginationCursor
                     $andEqualityCondition,
                     $andDifferenceCondition
                 ))
-                ->setParameters($queryParameters)
             ;
 
         } else {
             $qb
                 ->andWhere($rootAlias . '.' . $this->sequentialIdName .' > :sequentialIdValue')
-                ->setParameters(
+                ->setParameter(
                     [
                         'sequentialIdValue' =>$this->getSequentialIdValue(),
                     ]

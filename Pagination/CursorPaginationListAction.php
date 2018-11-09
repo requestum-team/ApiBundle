@@ -31,6 +31,8 @@ class CursorPaginationListAction extends ListAction
 
         $page = $this->extractParam($filters, 'page', 1);
         $perPage = $this->extractParam($filters, 'per-page', $this->options['default_per_page']);
+        $expandExpression = $this->extractParam($filters, 'expand', null);
+        $expand = $expandExpression ? explode(',', $expandExpression) : [];
         $cursor = $this->extractParam($filters, 'cursor', null);
 
         $cursorObject = null;
@@ -38,8 +40,6 @@ class CursorPaginationListAction extends ListAction
             $cursorObject = PaginationCursor::createCursorObjectFromBaseCode($cursor);
             $page = 1;
         }
-
-        $expandExpression = $this->extractParam($filters, 'expand', null);
 
         try {
             $entitiesQueryBuilder = $this->createQueryBuilder($filters);
@@ -61,17 +61,20 @@ class CursorPaginationListAction extends ListAction
             throw new BadRequestHttpException($message);
         }
 
+
         try {
             $result = $this->getPager($entitiesQueryBuilder, $perPage, $page, $cursorObject);
         } catch (InvalidArgumentException $exception) {
-            throw new BadRequestHttpException();
+            throw new BadRequestHttpException($exception->getMessage());
         }
 
         if ($request->attributes->get('count-only')) {
             $result = ['total' => $result->getNbResults()];
         }
 
-        return $this->handleResponse($result, Response::HTTP_OK);
+        return $this->handleResponse($result, Response::HTTP_OK, [
+            'expand' => $expand
+        ]);
     }
 
     /**
@@ -124,19 +127,7 @@ class CursorPaginationListAction extends ListAction
             throw new BadRequestHttpException('Bad cursor!');
         }
 
-        switch ($this->options['entity_manager']) {
-            case 'doctrine':
-                $adapter = new CursorDoctrineORMAdapter($entitiesQueryBuilder, $this->options['pagerfanta_fetch_join_collection'], $this->options['pagerfanta_use_output_walkers'], $cursor);
-                break;
-
-            case 'doctrine_mongodb':
-                throw new \Exception('Entity manager is not supported');
-                break;
-
-            default:
-                throw new \Exception('Entity manager not declared');
-                break;
-        }
+        $adapter = new CursorDoctrineORMAdapter($entitiesQueryBuilder, $this->options['pagerfanta_fetch_join_collection'], $this->options['pagerfanta_use_output_walkers'], $cursor);
 
         $pager = new ApiPagination($entitiesQueryBuilder, $adapter);
 
