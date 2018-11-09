@@ -28,6 +28,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: -10 }
 
+    core.normalizer.cursor_pagination:
+        class: Requestum\ApiBundle\Pagination\ApiPaginationNormalizer
+        tags:
+        - { name: serializer.normalizer }
+
     core.normalizer.pagerfanta:
         class: Requestum\ApiBundle\Serializer\Normalizer\PagerfantaNormalizer
         tags:
