@@ -19,12 +19,16 @@ trait ApiRepositoryTrait
      */
     public function filter(array $filters, QueryBuilder $builder = null)
     {
+        $alias = 'e';
+
         $filterExpander = new FilterExpander();
 
         $filters = $filterExpander->expand($filters);
 
         if (!$builder) {
-            $builder = $this->createQueryBuilder('e');
+            $builder = $this->createQueryBuilder($alias);
+        } else {
+            $alias = $builder->getRootAliases()[0];
         }
 
         $handlers = $this->createHandlers();
@@ -34,7 +38,7 @@ trait ApiRepositoryTrait
         }
 
         if ($this->isUseCommonHandler()) {
-            $handlers[] = new CommonHandler('e', $this->getPathAliases());
+            $handlers[] = new CommonHandler($alias, $this->getPathAliases());
         }
 
         foreach ($filters as $filter => $value) {
