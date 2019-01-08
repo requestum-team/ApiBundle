@@ -29,10 +29,8 @@ class ListAction extends EntityAction
     {
         $filters = $this->getFilters($request);
 
-        $page = $this->extractParam($filters, 'page', 1);
-        $perPage = $this->extractParam($filters, 'per-page', $this->options['default_per_page']);
-        $expandExpression = $this->extractParam($filters, 'expand', null);
-        $expand = $expandExpression ? explode(',', $expandExpression) : [];
+        $page = $request->query->get( 'page', 1);
+        $perPage = $request->query->get( 'per-page', $this->options['default_per_page']);
 
         try {
             $entitiesQueryBuilder = $this->createQueryBuilder($filters);
@@ -64,9 +62,7 @@ class ListAction extends EntityAction
             $result = ['total' => $result->getNbResults()];
         }
 
-        return $this->handleResponse($result, Response::HTTP_OK, [
-            'expand' => $expand
-        ]);
+        return $this->handleResponse($result, Response::HTTP_OK);
     }
 
     /**
@@ -77,19 +73,13 @@ class ListAction extends EntityAction
     protected function getFilters(Request $request)
     {
         $filters = [];
-        $unknownParams = [];
 
         foreach ($request->query->all() as $key => $value) {
-            if (!array_key_exists($key, $this->options['filters'])) {
-                $unknownParams[] = '"'.$key.'"';
+            if (in_array($key, $this->options['reserved_filters']) || !array_key_exists($key, $this->options['filters'])) {
                 continue;
             }
 
             $filters[$key] = $this->processFilter($key, $value);
-        }
-
-        if (count($unknownParams)) {
-            throw new BadRequestHttpException(sprintf('Unknown parameters: %s', implode(' ,', $unknownParams)));
         }
 
         return $filters;
@@ -125,16 +115,18 @@ class ListAction extends EntityAction
             'filters' => [],
             'pagerfanta_fetch_join_collection' => false,
             'pagerfanta_use_output_walkers' => null,
+            'reserved_filters' => [
+                'page',
+                'per-page',
+                'expand'
+            ],
         ]);
 
         $resolver->setNormalizer('filters', function (Options $options, $value) {
-            $reservedFilters = [
-                'page' => null,
-                'per-page' => null,
-                'expand' => null,
-            ];
-            $reservedOverrides = [];
             $result = [];
+
+            $reservedFilters = $options->offsetGet('reserved_filters');
+            $reservedOverrides = [];
 
             foreach ($value as $filter) {
                 list($key, $processor) = is_array($filter) ? $filter : [$filter, null];
@@ -150,7 +142,7 @@ class ListAction extends EntityAction
                 throw new \InvalidArgumentException(sprintf('next filters are reserved by ListAction: ["%s"]', implode('", "', $reservedOverrides)));
             }
 
-            return $result + $reservedFilters;
+            return $result;
         });
     }
 

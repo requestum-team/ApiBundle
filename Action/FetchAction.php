@@ -19,16 +19,12 @@ class FetchAction extends EntityAction
      */
     public function executeAction(Request $request)
     {
-        $expandExpression = $request->query->get('expand') ? $request->query->get('expand') : null;
-        $expand = $expandExpression ? explode(',', $expandExpression) : [];
-
         $user = $this->getEntity($request, $this->options['fetch_field']);
         $this->checkAccess($user);
 
         return $this->handleResponse(
             $user,
-            Response::HTTP_OK,
-            ['expand' => $expand]
+            Response::HTTP_OK
         );
     }
 
