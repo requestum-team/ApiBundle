@@ -75,7 +75,7 @@ class ListAction extends EntityAction
         $filters = [];
 
         foreach ($request->query->all() as $key => $value) {
-            if (in_array($key, $this->options['reserved_filters'])) {
+            if (in_array($key, $this->options['reserved_filters']) || !array_key_exists($key, $this->options['filters'])) {
                 continue;
             }
 
@@ -126,15 +126,20 @@ class ListAction extends EntityAction
             $result = [];
 
             $reservedFilters = $options->offsetGet('reserved_filters');
+            $reservedOverrides = [];
 
             foreach ($value as $filter) {
                 list($key, $processor) = is_array($filter) ? $filter : [$filter, null];
 
-                if (in_array($key, $reservedFilters)) {
-                    continue;
+                if (isset($reservedFilters[$key])) {
+                    $reservedOverrides[] = $key;
                 }
 
                 $result[$key] = $processor;
+            }
+
+            if (count($reservedOverrides)) {
+                throw new \InvalidArgumentException(sprintf('next filters are reserved by ListAction: ["%s"]', implode('", "', $reservedOverrides)));
             }
 
             return $result;
