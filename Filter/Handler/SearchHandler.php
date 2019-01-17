@@ -79,12 +79,22 @@ class SearchHandler extends AbstractByNameHandler
             }
 
             $whereExpr
-                ->add(sprintf('%s LIKE :query', $queryExpr));
+                ->add($this->formatSearchExpression($queryExpr, ':query'));
         }
 
         $builder
             ->andWhere($whereExpr)
             ->setParameter('query', $this->formatValue($value));
+    }
+
+    /**
+     * @param $queryExpr
+     * @param $value
+     * @return string
+     */
+    protected function formatSearchExpression($queryExpr, $value)
+    {
+        return sprintf('%s LIKE %s', $queryExpr, $value);
     }
 
     /**
