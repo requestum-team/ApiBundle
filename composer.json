@@ -29,13 +29,13 @@
   "require": {
     "php": ">=5.4",
     "swiftmailer/swiftmailer": "^4.2 || ^5.0",
-    "symfony/dependency-injection": "^3.1",
-    "symfony/serializer": "^3.1",
-    "symfony/form": "^3.1",
+    "symfony/dependency-injection": "^3.1 || ^4.1",
+    "symfony/serializer": "^3.1 || ^4.1",
+    "symfony/form": "^3.1 || ^4.1",
     "white-october/pagerfanta-bundle": "^1.0",
     "doctrine/doctrine-bundle": "^1.6",
     "doctrine/orm": "^2.5",
-    "symfony/yaml": "^3.0"
+    "symfony/yaml": "^3.0 || ^4.1"
   },
   "autoload-dev": {
     "psr-4": {
