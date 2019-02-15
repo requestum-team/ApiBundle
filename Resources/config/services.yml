@@ -1,5 +1,6 @@
 services:
     core.action.abstract:
+        public: true
         abstract: true
         calls:
             - ["setContainer", ["@service_container"]]
