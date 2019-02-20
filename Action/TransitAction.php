@@ -9,7 +9,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -58,6 +57,8 @@ class TransitAction extends UpdateAction
             ), '[transition]');
         }
 
+        $this->denyAccessUnlessGranted($this->options['access_attribute'].'.'.$transitionName, $entity);
+
         $workflow->apply($entity, $transitionName);
 
         parent::beforeSave($request, $entity, $form);
@@ -87,6 +88,7 @@ class TransitAction extends UpdateAction
 
         $resolver->setDefaults([
             'transitions' => [],
+            'access_attribute' => 'transit',
         ]);
     }
 
