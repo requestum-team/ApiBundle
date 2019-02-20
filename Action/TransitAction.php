@@ -57,7 +57,7 @@ class TransitAction extends UpdateAction
             ), '[transition]');
         }
 
-        $this->denyAccessUnlessGranted($this->options['access_attribute'].'.'.$transitionName, $entity);
+        $this->denyAccessUnlessGranted('transition.'.$transitionName, $entity);
 
         $workflow->apply($entity, $transitionName);
 
@@ -88,7 +88,6 @@ class TransitAction extends UpdateAction
 
         $resolver->setDefaults([
             'transitions' => [],
-            'access_attribute' => 'transit',
         ]);
     }
 
