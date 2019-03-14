@@ -4,6 +4,7 @@ namespace Requestum\ApiBundle\Filter\Handler;
 
 use Doctrine\ORM\QueryBuilder;
 use Requestum\ApiBundle\Util\QueryBuilderHelper;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class AbstractQueryHandler base handler to process search queries via LIKE statement on multiple fields
@@ -36,13 +37,29 @@ class SearchHandler extends AbstractByNameHandler
      */
     public function handle(QueryBuilder $builder, $filter, $value)
     {
+        if (is_array($value)) {
+
+            if (!isset($value['fields'])) {
+                throw new BadRequestHttpException('Wrong query format. No search fields specified.');
+            }
+
+            if (!isset($value['term'])) {
+                throw new BadRequestHttpException('Wrong query format. No search term specified.');
+            }
+
+            $fields = explode(',', $value['fields']);
+            $value = $value['term'];
+        }
+
         $whereExpr = $builder
             ->expr()
             ->orX();
 
-        foreach ($this->getSearchFields() as $field) {
+        $searchFields = $this->getSearchFields($fields ?? null);
 
-            if(is_array($field)) {
+        foreach ($searchFields as $field) {
+
+            if (is_array($field)) {
 
                 $concatPaths = [];
 
@@ -62,7 +79,7 @@ class SearchHandler extends AbstractByNameHandler
             }
 
             $whereExpr
-                ->add(sprintf('%s LIKE :query', $queryExpr));
+                ->add($this->formatSearchExpression($queryExpr, ':query'));
         }
 
         $builder
@@ -71,7 +88,17 @@ class SearchHandler extends AbstractByNameHandler
     }
 
     /**
-     * @param string $value
+     * @param $queryExpr
+     * @param $value
+     * @return string
+     */
+    protected function formatSearchExpression($queryExpr, $value)
+    {
+        return sprintf('%s LIKE %s', $queryExpr, $value);
+    }
+
+    /**
+     * @param string|array $value
      *
      * @return string
      */
@@ -97,12 +124,32 @@ class SearchHandler extends AbstractByNameHandler
     }
 
     /**
+     * @param $queryFields
      * @return array Returns list for fields to search. Supports fields in referenced entities in following format: "reference.reference_field",
      *               reference deep is unlimited, so in this case "vehicle.vehicleModel.name" two joins will be performed
      */
-    protected function getSearchFields()
+    protected function getSearchFields($queryFields = null)
     {
-        return $this->searchFields;
+        if (!$queryFields) {
+            return $this->searchFields;
+        }
+
+        $fields = [];
+
+        foreach ($this->searchFields as $key => $searchField) {
+            $fieldName = is_array($searchField) ? $key : $searchField;
+
+            if (($fieldKey = array_search($fieldName, $queryFields)) !== false) {
+                $fields[] = $searchField;
+                unset($queryFields[$fieldKey]);
+            }
+        }
+
+        if (!empty($queryFields)) {
+            throw new BadRequestHttpException('Undefined query fields: '.implode(', ', $queryFields));
+        }
+
+        return $fields;
     }
 
 

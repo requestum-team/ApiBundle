@@ -5,6 +5,7 @@ namespace Requestum\ApiBundle\Action;
 use Requestum\ApiBundle\Action\Extension\OptionsExtensionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -72,7 +73,7 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
 
         // no pass through context to decouple from concrete serializer implementation
         $context = [
-            'expand' => isset($serializationContext['expand']) ? $serializationContext['expand'] : [],
+            'expand' => $serializationContext['expand'],
             'groups' => isset($serializationContext['groups']) ? $serializationContext['groups'] : $this->options['serialization_groups'],
             'serialization_check_access' => isset($serializationContext['serialization_check_access']) ? $serializationContext['serialization_check_access'] : $this->options['serialization_check_access'],
         ];
@@ -102,6 +103,12 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
      */
     protected function handleResponse($data, $status = Response::HTTP_OK, array $serializationContext = [])
     {
+        $request = $this->get('request_stack')->getCurrentRequest();
+        $expandExpression = $request->query->get('expand') ? $request->query->get('expand') : null;
+        $expand = $expandExpression ? explode(',', $expandExpression) : [];
+
+        $serializationContext = $serializationContext + ['expand' => $expand];
+
         $body = null !== $data ? $this->serialize($data, (array) $serializationContext) : '';
 
         return new JsonResponse($body, $status, [], true);
@@ -126,10 +133,14 @@ abstract class BaseAction extends Controller implements ActionInterface, Options
         return $result;
     }
 
-    protected function checkAccess($subject = null)
+    /**
+     * @param null   $subject
+     * @param string $message
+     */
+    protected function checkAccess($subject = null,  $message = 'Access Denied.')
     {
         if ($accessAttr = $this->options['access_attribute']) {
-            $this->denyAccessUnlessGranted($accessAttr, $subject);
+            $this->denyAccessUnlessGranted($accessAttr, $subject, $message);
         }
     }
 

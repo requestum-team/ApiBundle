@@ -9,7 +9,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -57,6 +56,8 @@ class TransitAction extends UpdateAction
                 'error.workflow.wrong_transition'
             ), '[transition]');
         }
+
+        $this->denyAccessUnlessGranted('transition.'.$transitionName, $entity);
 
         $workflow->apply($entity, $transitionName);
 
