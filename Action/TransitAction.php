@@ -9,8 +9,12 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Workflow\Transition;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Workflow\Transition;
+use Symfony\Component\Workflow\TransitionBlockerList;
+use Symfony\Component\Workflow\TransitionBlocker;
+use Symfony\Component\Workflow\Exception\TransitionException;
 
 /**
  * Class TransitAction
@@ -36,32 +40,92 @@ class TransitAction extends UpdateAction
         $transitionName = $form->get('transition')->getData();
         $workflow = $this->get('workflow.registry')->get($entity);
 
-        if (!$workflow->can($entity, $transitionName)) {
-            $possibleTransitionNames = array_map(function (Transition $value) {
-                return $value->getName();
-            }, $workflow->getEnabledTransitions($entity));
+        try {
+            /** @var TransitionBlockerList $blockerList */
+            $blockerList = $workflow->buildTransitionBlockerList($entity, $transitionName);
 
+            if ($blockerList->count()) {
+                $errors = [];
+                foreach ($blockerList as $transitionBlocker) {
+                    $errors[] = $this->getTransitionBlockerError(
+                        $workflow,
+                        $entity,
+                        $transitionName,
+                        $transitionBlocker
+                    );
+                }
 
-            $messageTemplate = 'Wrong transition "{{transition}}". Possible transitions: ["{{possible_transitions}}"]';
-            $messageParams = [
-                '{{transition}}' => $transitionName,
-                '{{possible_transitions}}' => implode('" ,"', $possibleTransitionNames),
-            ];
+                throw new FormValidationException($errors, '[transition]');
+            }
 
-            throw new FormValidationException(new FormError(
-                $this->get('translator')->trans($messageTemplate, $messageParams),
-                $messageTemplate,
-                $messageParams,
-                null,
-                'error.workflow.wrong_transition'
-            ), '[transition]');
+            $this->denyAccessUnlessGranted('transition.'.$transitionName, $entity);
+            $workflow->apply($entity, $transitionName);
+
+            return UpdateAction::beforeSave($request, $entity, $form);
+        } catch (TransitionException $exception) {
+            throw new FormValidationException(
+                $this->getAbstractError($workflow, $entity, $transitionName),
+                '[transition]'
+            );
         }
+    }
 
-        $this->denyAccessUnlessGranted('transition.'.$transitionName, $entity);
+    /**
+     * @param Workflow $workflow
+     * @param $entity
+     * @param $transitionName
+     *
+     * @return FormError
+     */
+    protected function getAbstractError(Workflow $workflow, $entity, $transitionName)
+    {
+        $possibleTransitionNames = array_map(function (Transition $value) {
+            return $value->getName();
+        }, $workflow->getEnabledTransitions($entity));
 
-        $workflow->apply($entity, $transitionName);
+        $messageTemplate = 'Wrong transition "{{transition}}". Possible transitions: ["{{possible_transitions}}"]';
+        $messageParams = [
+            '{{transition}}' => $transitionName,
+            '{{possible_transitions}}' => implode('" ,"', $possibleTransitionNames),
+        ];
 
-        parent::beforeSave($request, $entity, $form);
+        return new FormError(
+            $this->get('translator')->trans($messageTemplate, $messageParams),
+            $messageTemplate,
+            $messageParams,
+            null,
+            'error.workflow.wrong_transition'
+        );
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param $entity
+     * @param $transitionName
+     * @param TransitionBlocker $blocker
+     *
+     * @return FormError
+     */
+    protected function getTransitionBlockerError(
+        Workflow $workflow,
+        $entity,
+        $transitionName,
+        TransitionBlocker $blocker
+    ) {
+        switch ($code = $blocker->getCode()) {
+            case TransitionBlocker::BLOCKED_BY_EXPRESSION_GUARD_LISTENER:
+            case TransitionBlocker::BLOCKED_BY_MARKING:
+            case TransitionBlocker::UNKNOWN:
+                return $this->getAbstractError($workflow, $entity, $transitionName);
+            default:
+                return new FormError(
+                    $blocker->getMessage(),
+                    null,
+                    [],
+                    null,
+                    $blocker
+                );
+        }
     }
 
     /**
