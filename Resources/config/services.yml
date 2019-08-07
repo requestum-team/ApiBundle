@@ -41,3 +41,8 @@ services:
         arguments: ["@core.util.error_factory"]
         tags:
             - { name: serializer.normalizer }
+
+    core.workflow.transition_blocker_factory:
+        class: Requestum\ApiBundle\Workflow\TransitionBlockerFactory
+        arguments:
+            - "@translator"
