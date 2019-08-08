@@ -46,3 +46,8 @@ services:
         class: Requestum\ApiBundle\Workflow\TransitionBlockerFactory
         arguments:
             - "@translator"
+
+    core.workflow.transition_blocker_error_transformer:
+        class: Requestum\ApiBundle\Workflow\TransitionBlockerErrorTransformer
+        arguments:
+            - "@translator"

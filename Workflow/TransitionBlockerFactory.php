@@ -11,11 +11,14 @@ use Symfony\Component\Workflow\TransitionBlocker;
  */
 class TransitionBlockerFactory
 {
-    /** @var TranslatorInterface  */
+    /**
+     * @var TranslatorInterface
+     */
     protected $translator;
 
     /**
-     * TransitionBlockerBuilder constructor.
+     * TransitionBlockerBuilder constructor
+     * .
      * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
