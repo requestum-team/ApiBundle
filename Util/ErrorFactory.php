@@ -4,6 +4,7 @@ namespace Requestum\ApiBundle\Util;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Workflow\TransitionBlocker;
 
 /**
  * Class ErrorFactory.
@@ -72,6 +73,10 @@ class ErrorFactory
             return $this->formatConstraintViolationCode($cause);
         }
 
+        if ($cause instanceof TransitionBlocker) {
+            return $this->formatTransitionBlockerCode($cause);
+        }
+
         return $cause;
     }
 
@@ -101,6 +106,21 @@ class ErrorFactory
         return $errorCode;
     }
 
+    /**
+     * @param TransitionBlocker $blocker
+     *
+     * @return string
+     */
+    protected function formatTransitionBlockerCode(TransitionBlocker $blocker)
+    {
+        return $blocker->getCode();
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
     protected function inflectString($string)
     {
         return strtolower(preg_replace('~(?<=\\w)([A-Z])~', '_$1', $string));
