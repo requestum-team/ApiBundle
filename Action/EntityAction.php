@@ -159,7 +159,7 @@ abstract class EntityAction extends BaseAction
         foreach ($filters as $key => &$val) {
             if (is_array($val)) {
                 $this->processPlaceholders($val);
-            } elseif ($val == '__USER__') {
+            } elseif ($val === '__USER__') {
                 if (!is_object($user = $this->getUser())) {
                     throw new AccessDeniedException();
                 }
