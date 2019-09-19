@@ -2,7 +2,7 @@
 
 namespace Requestum\ApiBundle\Workflow;
 
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\TransitionBlockerList;
 
