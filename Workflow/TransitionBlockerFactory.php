@@ -3,7 +3,7 @@
 namespace Requestum\ApiBundle\Workflow;
 
 use InvalidArgumentException;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Workflow\TransitionBlocker;
 
 /**
