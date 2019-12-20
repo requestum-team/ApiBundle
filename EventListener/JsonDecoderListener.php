@@ -4,6 +4,7 @@ namespace Requestum\ApiBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * JsonDecoderListener.
@@ -17,7 +18,9 @@ class JsonDecoderListener
     {
         $request = $event->getRequest();
 
-        if ($request->headers->has('Content-Type')) {
+        if ($event->getRequestType() === HttpKernelInterface::MASTER_REQUEST
+            && $request->headers->has('Content-Type')
+        ) {
             $contentType = $request->headers->get('Content-Type');
 
             if (substr_count($contentType, 'application/json') > 0) {
