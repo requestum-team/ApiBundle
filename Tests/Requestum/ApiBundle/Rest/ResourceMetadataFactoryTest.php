@@ -1,6 +1,6 @@
 <?php
 
-namespace Requestum\ApiBundle\Tests\Rest;
+namespace Tests\Requestum\ApiBundle\Rest;
 
 use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -29,7 +29,7 @@ class ResourceMetadataFactoryTest extends TestCase
      */
     private $resourceMetadataFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resourceMetadataFactory = new ResourceMetadataFactory(new AnnotationReader);
     }

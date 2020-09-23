@@ -1,21 +1,22 @@
 <?php
 
-namespace Requestum\ApiBundle\Tests\Util;
+namespace Tests\Requestum\ApiBundle\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintViolation;
 
 use Requestum\ApiBundle\Util\ErrorFactory;
 
-class ErrorFactoryTest extends \PHPUnit_Framework_TestCase
+class ErrorFactoryTest extends TestCase
 {
     /**
      * @var ErrorFactory
      */
     protected $errorFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

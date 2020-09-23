@@ -1,0 +1,10 @@
+version: '3'
+services:
+  php:
+    build:
+      context: .
+    tty: true
+    environment:
+      - COMPOSER_MEMORY_LIMIT=1
+    volumes:
+      - ./:/var/www
