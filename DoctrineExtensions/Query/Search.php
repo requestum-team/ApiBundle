@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\DoctrineExtensions\Query;
+namespace Requestum\ApiBundle\DoctrineExtensions\Query;
 
 use Doctrine\ORM\Query\AST\Functions\FunctionNode,
     Doctrine\ORM\Query\Lexer;
@@ -29,7 +29,16 @@ class Search extends FunctionNode
      */
     public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker)
     {
-        $configuration = $sqlWalker->getConnection()->getDriver();
-        return '(' . $this->fieldExpression->dispatch($sqlWalker) . ' ILIKE ' . $this->likeExpression->dispatch($sqlWalker) . ')';
+        $params = $sqlWalker->getConnection()->getParams();
+        switch ($params['driver']) {
+            case 'pdo_pgsql':
+                $sql = '(' . $this->fieldExpression->dispatch($sqlWalker) . ' ILIKE ' . $this->likeExpression->dispatch($sqlWalker) . ')';
+                break;
+            default:
+                $sql = '(' . $this->fieldExpression->dispatch($sqlWalker) . ' LIKE ' . $this->likeExpression->dispatch($sqlWalker) . ')';
+                break;
+        }
+
+        return $sql;
     }
 }

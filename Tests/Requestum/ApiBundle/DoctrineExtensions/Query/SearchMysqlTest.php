@@ -11,11 +11,10 @@ class SearchMysqlTest
 {
     public function testSearch()
     {
-        $dql = "SELECT d FROM DoctrineExtensions\Tests\Entities\Date d WHERE AT_TIME_ZONE(d.created, :timeZone) < :currentTime";
+        $dql = "SELECT u FROM Tests\Requestum\ApiBundle\DoctrineExtensions\Entities\User u WHERE SEARCH(u.fullName, :value) = true";
         $q = $this->entityManager->createQuery($dql);
-        $q->setParameter('timeZone', 'UTC');
-        $q->setParameter('currentTime', date('Y-m-d H:i:s'));
-        $sql = 'SELECT d0_.id AS id_0, d0_.created AS created_1 FROM Date d0_ WHERE d0_.created AT TIME ZONE ? < ?';
+        $q->setParameter('value', '%test%');
+        $sql = 'SELECT u0_.id AS id_0, u0_.fullName AS fullName_1, u0_.email AS email_1 FROM User u0_ WHERE u0_.fullName LIKE "%test%"';
         $this->assertEquals($sql, $q->getSql());
     }
 }

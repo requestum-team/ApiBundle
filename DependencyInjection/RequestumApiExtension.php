@@ -33,7 +33,7 @@ class RequestumApiExtension extends Extension implements PrependExtensionInterfa
             'orm' => [
                 'dql' => [
                     'string_functions' => [
-                        'SEARCH' => 'AppBundle\DoctrineExtensions\Query\Search'
+                        'SEARCH' => 'Requestum\ApiBundle\DoctrineExtensions\Query\Search'
                     ]
                 ]
             ]
