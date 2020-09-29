@@ -1,5 +1,5 @@
 {
-  "name": "requestum/api-bundle",
+  "name": "requestum-test/api-bundle",
   "type" : "symfony-bundle",
   "description": "Symfony ApiBundle",
   "keywords": ["symfony", "api", "bundle"],
