@@ -65,7 +65,7 @@ class AttributeExtractionStrategy
 
         $property = $referenceMetadata->field;
 
-        if (isset($context['groups'])) {
+        if (isset($context['groups']) && is_array($context['groups'])) {
             if (count(array_intersect($context['groups'], $referenceMetadata->groups)) > 0) {
                 return $propertyValue;
             }
