@@ -17,7 +17,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
+        $treeBuilder = new TreeBuilder('requestum_api_bundle');
         $rootNode = $treeBuilder->root('core');
 
         // Here you should define the parameters that are allowed to
