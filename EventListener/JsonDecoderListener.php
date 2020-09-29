@@ -3,7 +3,7 @@
 namespace Requestum\ApiBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * JsonDecoderListener.
@@ -11,9 +11,9 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 class JsonDecoderListener
 {
     /**
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         $request = $event->getRequest();
 
