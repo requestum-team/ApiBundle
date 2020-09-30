@@ -22,7 +22,7 @@ services:
 
     core.listener.exception:
         class: Requestum\ApiBundle\EventListener\Exception\ExceptionListener
-        parent: twig.exception_listener
+        parent: exception_listener
         calls:
             - [setEnvironment, ["%kernel.environment%"]]
         tags:

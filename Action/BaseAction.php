@@ -3,7 +3,7 @@
 namespace Requestum\ApiBundle\Action;
 
 use Requestum\ApiBundle\Action\Extension\OptionsExtensionInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * BaseController Class.
  */
-abstract class BaseAction extends Controller implements ActionInterface, OptionsExtensionInterface
+abstract class BaseAction extends AbstractController implements ActionInterface, OptionsExtensionInterface
 {
     /**
      * @var array

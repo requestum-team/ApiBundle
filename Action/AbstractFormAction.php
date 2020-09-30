@@ -162,7 +162,7 @@ abstract class AbstractFormAction extends EntityAction
     protected function beforeSave(Request $request, $entity, Form $form)
     {
         foreach ($this->options['before_save_events'] + ['action.before_save'] as $event) {
-            $this->get('event_dispatcher')->dispatch($event, new FormActionEvent($request, $entity, $form, $this->getDoctrine()));
+            $this->get('event_dispatcher')->dispatch(new FormActionEvent($request, $entity, $form, $this->getDoctrine()), $event);
         }
     }
 
@@ -174,7 +174,7 @@ abstract class AbstractFormAction extends EntityAction
     protected function afterSave(Request $request, $entity, Form $form)
     {
         foreach ($this->options['after_save_events'] + ['action.after_save'] as $event) {
-            $this->get('event_dispatcher')->dispatch($event, new FormActionEvent($request, $entity, $form, $this->getDoctrine()));
+            $this->get('event_dispatcher')->dispatch(new FormActionEvent($request, $entity, $form, $this->getDoctrine()), $event);
         }
     }
 
