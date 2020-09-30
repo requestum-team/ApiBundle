@@ -1,6 +1,6 @@
 <?php
 
-namespace Requestum\ApiBundle\Tests\Util;
+namespace Tests\Requestum\ApiBundle\Util;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormError;

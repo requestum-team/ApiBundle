@@ -150,17 +150,17 @@ class CommonHandler extends AbstractHandler
             ;
         } elseif (strpos($value, '*') === 0 && strrpos($value, '*') === strlen($value) - 1) {
             $query
-                ->andWhere($realField.' LIKE '.':'.$parameterName)
+                ->andWhere(sprintf('SEARCH(%s,%s) = true', $realField, ':'.$parameterName))
                 ->setParameter(':'.$parameterName, '%'.substr($value, 1, -1).'%')
             ;
         } elseif (strpos($value, '*') === 0) {
             $query
-                ->andWhere($realField.' LIKE  '.':'.$parameterName)
+                ->andWhere(sprintf('SEARCH(%s,%s) = true', $realField, ':'.$parameterName))
                 ->setParameter(':'.$parameterName, '%'.substr($value, 1))
             ;
         } elseif (strrpos($value, '*') === strlen($value) - 1) {
             $query
-                ->andWhere($realField.' LIKE '.':'.$parameterName)
+                ->andWhere(sprintf('SEARCH(%s,%s) = true', $realField, ':'.$parameterName))
                 ->setParameter(':'.$parameterName, substr($value, 0, -1).'%')
             ;
         } elseif ($value === 'is_null_value') {

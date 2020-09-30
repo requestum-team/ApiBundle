@@ -1,5 +1,5 @@
 {
-  "name": "requestum-test/api-bundle",
+  "name": "requestum/api-bundle",
   "type" : "symfony-bundle",
   "description": "Symfony ApiBundle",
   "keywords": ["symfony", "api", "bundle"],
@@ -49,13 +49,7 @@
     }
   },
   "minimum-stability": "stable",
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/requestum-team/ApiBundle.git"
-    }
-  ],
   "require-dev": {
-    "phpunit/phpunit": "9.3"
+    "phpunit/phpunit": "^9.2"
   }
 }

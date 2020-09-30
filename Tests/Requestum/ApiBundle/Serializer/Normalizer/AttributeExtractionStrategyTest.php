@@ -1,10 +1,8 @@
 <?php
 
-namespace Requestum\ApiBundle\Tests\Serializer\Normalizer;
-
+namespace Tests\Requestum\ApiBundle\Serializer\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-use Doctrine\Common\Annotations\AnnotationReader;
 
 use Requestum\ApiBundle\Rest\ResourceMetadataFactory;
 use Requestum\ApiBundle\Serializer\Normalizer\AttributeExtractionStrategy;
