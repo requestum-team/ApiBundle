@@ -29,7 +29,7 @@ class ResourceMetadataFactoryTest extends TestCase
      */
     private $resourceMetadataFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resourceMetadataFactory = new ResourceMetadataFactory(new AnnotationReader);
     }

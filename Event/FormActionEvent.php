@@ -3,7 +3,6 @@
 namespace Requestum\ApiBundle\Event;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 

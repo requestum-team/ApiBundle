@@ -62,7 +62,7 @@ class AttributeExtractionStrategyTest extends TestCase
      */
     private $testObject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resourceMetadataFactory = $this->createMock(ResourceMetadataFactory::class);
 
@@ -94,7 +94,7 @@ class AttributeExtractionStrategyTest extends TestCase
     public function testGetValueScalar()
     {
         $propertyValue = $this->attributeExtractionStrategy->getValue($this->testObject, 'id');
-        static::assertInternalType('integer', $propertyValue);
+        static::assertIsInt($propertyValue);
     }
 
     public function testGetValueSimpleObject()
