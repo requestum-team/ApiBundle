@@ -56,7 +56,7 @@ class AttributeExtractionStrategy
         if ($this->isExpand($attribute, $context)) {
             return new ReferenceWrapper($propertyValue, $attribute);
         }
-        
+
         $propertyMetadata = $this->resourseMetadaFactory->getPropertyMetadata($object, $attribute);
 
         if (!($referenceMetadata = isset($propertyMetadata[Reference::class]) ? $propertyMetadata[Reference::class] : null)) {
@@ -65,7 +65,7 @@ class AttributeExtractionStrategy
 
         $property = $referenceMetadata->field;
 
-        if (isset($context['groups']) && is_array($context['groups'])) {
+        if (isset($context['groups'])) {
             if (count(array_intersect($context['groups'], $referenceMetadata->groups)) > 0) {
                 return $propertyValue;
             }
