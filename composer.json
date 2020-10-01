@@ -1,8 +1,8 @@
 {
-  "name": "requestum/api-bundle2",
+  "name": "requestum/api-bundle",
   "type" : "symfony-bundle",
-  "description": "Bundle that simplifies API development",
-  "keywords": ["symfony", "api", "bundle", "rest"],
+  "description": "Symfony ApiBundle",
+  "keywords": ["symfony", "api", "bundle"],
   "license": "MIT",
   "authors": [
     {
