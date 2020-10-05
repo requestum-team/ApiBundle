@@ -94,7 +94,7 @@ class SearchHandler extends AbstractByNameHandler
      */
     protected function formatSearchExpression($queryExpr, $value)
     {
-        return sprintf('%s LIKE %s', $queryExpr, $value);
+        return sprintf('SEARCH(%s,%s) = true', $queryExpr, $value);
     }
 
     /**
