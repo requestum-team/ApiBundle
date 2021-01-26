@@ -87,7 +87,7 @@ abstract class EntityAction extends BaseAction
         $filters = [];
 
         foreach ((array) $param as $singleParam) {
-            if (!($value = $request->get($singleParam))) {
+            if (null === ($value = $request->get($singleParam))) {
                 throw $this->createNotFoundException();
             }
 
