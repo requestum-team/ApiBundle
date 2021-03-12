@@ -92,7 +92,7 @@ class AttributeExtractionStrategyTest extends TestCase
     public function testGetValueScalar()
     {
         $propertyValue = $this->attributeExtractionStrategy->getValue($this->testObject, 'id');
-        static::assertInternalType('integer', $propertyValue);
+        static::assertIsInt($propertyValue);
     }
 
     public function testGetValueSimpleObject()

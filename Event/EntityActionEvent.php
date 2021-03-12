@@ -3,7 +3,7 @@
 namespace Requestum\ApiBundle\Event;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 
 class EntityActionEvent extends Event

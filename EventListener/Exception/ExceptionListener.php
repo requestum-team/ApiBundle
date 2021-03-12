@@ -4,8 +4,8 @@ namespace Requestum\ApiBundle\EventListener\Exception;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener as BaseExceptionListener;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
@@ -21,11 +21,11 @@ class ExceptionListener extends BaseExceptionListener
     /**
      * Prepare response for exception.
      *
-     * @param GetResponseForExceptionEvent $event event
+     * @param ExceptionEvent $event event
      */
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event)
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
 
         $this->logException(
             $exception,
@@ -38,7 +38,7 @@ class ExceptionListener extends BaseExceptionListener
             )
         );
         if ($exception instanceof HttpExceptionInterface) {
-            $message = $event->getException()->getMessage();
+            $message = $event->getThrowable()->getMessage();
         } else {
             if ('prod' === $this->environment) {
                 $message = 'Internal Server Error';
